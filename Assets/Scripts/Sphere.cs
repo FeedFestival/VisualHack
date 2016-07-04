@@ -6,21 +6,30 @@ public class Sphere : MonoBehaviour
 {
     private Main _main;
 
+    [HideInInspector]
     public Controller Controller;
 
     public Move GoDirection;
 
     // user input
+    [HideInInspector]
     public bool UserPressedRight;
+    [HideInInspector]
     public bool UserPressedLeft;
+    [HideInInspector]
     public bool UserPressedUp;
+    [HideInInspector]
     public bool UserPressedDown;
 
-    // locks
-    public bool RightPushingLocked;
-    public bool LeftPushingLocked;
-    public bool UpPushingLocked;
-    public bool DownPushingLocked;
+    // boxes
+    [HideInInspector]
+    public Box UpBox;
+    [HideInInspector]
+    public Box RightBox;
+    [HideInInspector]
+    public Box DownBox;
+    [HideInInspector]
+    public Box LeftBox;
 
     public void Initialize(Main main)
     {
@@ -58,6 +67,8 @@ public class Sphere : MonoBehaviour
 
     public void StopDirection(int moveIndex)
     {
+        if (GoDirection == (Move)moveIndex)
+            GoDirection = Move.None;
         switch ((Move)moveIndex)
         {
             case Move.Up:
@@ -85,23 +96,23 @@ public class Sphere : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.D))
-            UserPressedRight = true;
+            MoveDirection(1);
         if (Input.GetKeyUp(KeyCode.D))
-            UserPressedRight = false;
+            StopDirection(1);
 
         if (Input.GetKeyDown(KeyCode.A))
-            UserPressedLeft = true;
+            MoveDirection(3);
         if (Input.GetKeyUp(KeyCode.A))
-            UserPressedLeft = false;
+            StopDirection(3);
 
         if (Input.GetKeyDown(KeyCode.W))
-            UserPressedUp = true;
+            MoveDirection(0);
         if (Input.GetKeyUp(KeyCode.W))
-            UserPressedUp = false;
+            StopDirection(0);
 
         if (Input.GetKeyDown(KeyCode.S))
-            UserPressedDown = true;
+            MoveDirection(2);
         if (Input.GetKeyUp(KeyCode.S))
-            UserPressedDown = false;
+            StopDirection(2);
     }
 }

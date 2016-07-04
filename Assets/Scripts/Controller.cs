@@ -17,23 +17,18 @@ public class Controller : MonoBehaviour
     private bool _pushLeft;
     private bool _pushUp;
     private bool _pushDown;
-
-    public bool LockRightPushing;
-    public bool LockLeftPushing;
-    public bool LockUpPushing;
-    public bool LockDownPushing;
-
+    
     // predefined
     private Vector3 _startMarker;
     private Vector3 _endMarkerRight;
     private Vector3 _endMarkerLeft;
     private Vector3 _endMarkerUp;
     private Vector3 _endMarkerDown;
-
-    public bool PushingFromRight;
-    public bool PushingFromLeft;
-    public bool PushingFromUp;
-    public bool PushingFromDown;
+    
+    public Obstacle UpperObject = Obstacle.Nothing;
+    public Obstacle RightObject = Obstacle.Nothing;
+    public Obstacle DownObject = Obstacle.Nothing;
+    public Obstacle LeftObject = Obstacle.Nothing;
 
     public void Initialize(Sphere obj)
     {
@@ -57,60 +52,59 @@ public class Controller : MonoBehaviour
         referenceBool = false;
     }
 
-    bool CheckUserPress(Direction direction)
+    private bool CheckUserPress(Direction direction)
     {
         switch (direction)
         {
             case Direction.Up:
 
-                return _sphere.UserPressedUp && _sphere.UpPushingLocked == false;
-            //return _box.Sphere && _box.UpPushingLocked == false;
-
+                if (_sphere.UserPressedUp)
+                {
+                    if (UpperObject == Obstacle.Nothing)
+                        return true;
+                    if (UpperObject == Obstacle.Box && _sphere.UpBox.UpperObject == Obstacle.Nothing)
+                        return true;
+                }
+                return false;
+                
             case Direction.Right:
-                
-                return _sphere.UserPressedRight && _sphere.RightPushingLocked == false;
-            //return _box.Sphere && _box.RightPushingLocked == false;
 
+                if (_sphere.UserPressedRight)
+                {
+                    if (RightObject == Obstacle.Nothing)
+                        return true;
+                    if (RightObject == Obstacle.Box && _sphere.RightBox.RightObject == Obstacle.Nothing)
+                        return true;
+                }
+                return false;
+                
             case Direction.Down:
-                
-                return _sphere.UserPressedDown && _sphere.DownPushingLocked == false;
-            //return _box.Sphere && _box.DownPushingLocked == false;
 
+                if (_sphere.UserPressedDown)
+                {
+                    if (DownObject == Obstacle.Nothing)
+                        return true;
+                    if (DownObject == Obstacle.Box && _sphere.DownBox.DownObject == Obstacle.Nothing)
+                        return true;
+                }
+                return false;
+            
             case Direction.Left:
-                
-                return _sphere.UserPressedLeft && _sphere.LeftPushingLocked == false;
-            //return _box.Sphere && _box.LeftPushingLocked == false;
 
+                if (_sphere.UserPressedLeft)
+                {
+                    if (LeftObject == Obstacle.Nothing)
+                        return true;
+                    if (LeftObject == Obstacle.Box && _sphere.LeftBox.LeftObject == Obstacle.Nothing)
+                        return true;
+                }
+                return false;
+            
             default:
                 throw new ArgumentOutOfRangeException("direction", direction, null);
         }
     }
-
-    bool CheckLockedPush(Direction direction)
-    {
-        switch (direction)
-        {
-            case Direction.Up:
-                
-                return _sphere.UpPushingLocked == false;
-
-            case Direction.Right:
-                
-                return _sphere.RightPushingLocked == false;
-
-            case Direction.Down:
-                
-                return _sphere.DownPushingLocked == false;
-
-            case Direction.Left:
-                
-                return _sphere.LeftPushingLocked == false;
-
-            default:
-                throw new ArgumentOutOfRangeException("direction", direction, null);
-        }
-    }
-
+    
     void FixedUpdate()
     {
         if (_pushLeft == false && _pushUp == false && _pushDown == false)
@@ -158,188 +152,75 @@ public class Controller : MonoBehaviour
 
     void OnTriggerEnter(Collider foreignObjectCollider)
     {
-        LockPushing(foreignObjectCollider.gameObject.tag, true);
-
         if (foreignObjectCollider.CompareTag("BoxUp"))
         {
-            PushingFromUp = true;
+            DownObject = Obstacle.Box;
         }
         if (foreignObjectCollider.CompareTag("BoxRight"))
         {
-            PushingFromRight = true;
+            LeftObject = Obstacle.Box;
         }
         if (foreignObjectCollider.CompareTag("BoxDown"))
         {
-            PushingFromDown = true;
+            UpperObject = Obstacle.Box;
         }
         if (foreignObjectCollider.CompareTag("BoxLeft"))
         {
-            PushingFromLeft = true;
+            RightObject = Obstacle.Box;
+        }
+
+        if (foreignObjectCollider.CompareTag("SolidUp"))
+        {
+            UpperObject = Obstacle.Solid;
+        }
+        if (foreignObjectCollider.CompareTag("SolidRight"))
+        {
+            RightObject = Obstacle.Solid;
+        }
+        if (foreignObjectCollider.CompareTag("SolidDown"))
+        {
+            DownObject = Obstacle.Solid;
+        }
+        if (foreignObjectCollider.CompareTag("SolidLeft"))
+        {
+            LeftObject = Obstacle.Solid;
         }
     }
 
     void OnTriggerExit(Collider foreignObjectCollider)
     {
-        LockPushing(foreignObjectCollider.gameObject.tag, false);
-
         if (foreignObjectCollider.CompareTag("BoxUp"))
         {
-            PushingFromUp = false;
+            DownObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxRight"))
         {
-            PushingFromRight = false;
+            LeftObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxDown"))
         {
-            PushingFromDown = false;
+            UpperObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxLeft"))
         {
-            PushingFromLeft = false;
+            RightObject = Obstacle.Nothing;
         }
-    }
 
-    private void LockPushing(string tag, bool value)
-    {
-        switch (tag)
+        if (foreignObjectCollider.CompareTag("SolidUp"))
         {
-            case "SolidUp":
-                _sphere.UpPushingLocked = value;
-                break;
-            case "SolidRight":
-                _sphere.RightPushingLocked = value;
-                break;
-            case "SolidDown":
-                _sphere.DownPushingLocked = value;
-                break;
-            case "SolidLeft":
-                _sphere.LeftPushingLocked = value;
-                break;
+            UpperObject = Obstacle.Nothing;
         }
-    }
-
-    public void Push(Direction directionIndex)
-    {
-        var direction = (Direction)directionIndex;
-        switch (direction)
+        if (foreignObjectCollider.CompareTag("SolidRight"))
         {
-            case Direction.Up:
-
-                _sphere.UpPushingLocked = LockUpPushing;
-                break;
-
-            case Direction.Right:
-
-                _sphere.RightPushingLocked = LockRightPushing;
-                break;
-
-            case Direction.Down:
-
-                _sphere.DownPushingLocked = LockDownPushing;
-                break;
-
-            case Direction.Left:
-
-                _sphere.LeftPushingLocked = LockLeftPushing;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
+            RightObject = Obstacle.Nothing;
         }
-    }
-
-    public void DontPush(Direction directionIndex)
-    {
-        var direction = (Direction)directionIndex;
-        switch (direction)
+        if (foreignObjectCollider.CompareTag("SolidDown"))
         {
-            case Direction.Up:
-
-                _sphere.UpPushingLocked = true;
-                break;
-
-            case Direction.Right:
-
-                _sphere.RightPushingLocked = true;
-                break;
-
-            case Direction.Down:
-
-                _sphere.DownPushingLocked = true;
-                break;
-
-            case Direction.Left:
-
-                _sphere.LeftPushingLocked = true;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
+            DownObject = Obstacle.Nothing;
         }
-    }
-
-    public void LockPushing(Direction directionIndex)
-    {
-        var direction = (Direction)directionIndex;
-
-        DontPush(direction);
-
-        switch (direction)
+        if (foreignObjectCollider.CompareTag("SolidLeft"))
         {
-            case Direction.Up:
-
-                LockUpPushing = true;
-                break;
-
-            case Direction.Right:
-
-                LockRightPushing = true;
-                break;
-
-            case Direction.Down:
-
-                LockDownPushing = true;
-                break;
-
-            case Direction.Left:
-
-                LockLeftPushing = true;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
+            LeftObject = Obstacle.Nothing;
         }
-    }
-
-    public void DontLockPushing(Direction directionIndex)
-    {
-        var direction = (Direction)directionIndex;
-        switch (direction)
-        {
-            case Direction.Up:
-
-                LockUpPushing = false;
-                break;
-
-            case Direction.Right:
-
-                LockRightPushing = false;
-                break;
-
-            case Direction.Down:
-
-                LockDownPushing = false;
-                break;
-
-            case Direction.Left:
-
-                LockLeftPushing = false;
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException();
-        }
-        Push(direction);
     }
 }

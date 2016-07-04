@@ -11,6 +11,8 @@ public class Main : MonoBehaviour
     public GameObject DebugContainer;
     public InputField DebugTextGameObject;
 
+    private Transform _cameraTransform;
+
     private string _debugText;
     public string DebugText
     {
@@ -81,6 +83,8 @@ public class Main : MonoBehaviour
         _leftPoint = -_rightPoint;
         _topPoint = _height / 2.0f;
         _bottomPoint = -_topPoint;
+
+        _cameraTransform = transform;
 
         SetupGameUi();
 
@@ -189,7 +193,7 @@ public class Main : MonoBehaviour
         Image image;
         Text text;
 
-        Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
+        Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
             switch (child.gameObject.name)
@@ -243,28 +247,54 @@ public class Main : MonoBehaviour
     private void SetupGameControlls()
     {
         Image image;
-        
-        Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
+
+        if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+            ControllerType == ControllerType.Zas)
+        {
+            if (_width == 854)
+            {
+                _cameraTransform.position = new Vector3(0.09f, -0.07f, 0);
+                GetComponent<Camera>().orthographicSize = 4.7f;
+            }
+        }
+        else if (ControllerType == ControllerType.Classic)
+        {
+            if (_width == 854)
+            {
+                _cameraTransform.position = new Vector3(2.25f, -0.07f, 0);
+                GetComponent<Camera>().orthographicSize = 4.77f;
+            }
+        }
+        else
+        {
+            if (_width == 854)
+            {
+                _cameraTransform.position = new Vector3(1.4f, -0.07f, 0);
+                GetComponent<Camera>().orthographicSize = 4.77f;
+            }
+        }
+
+        Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
             switch (child.gameObject.name)
             {
                 case "LeftBackground":
-                    image = child.gameObject.GetComponent<Image>();
+                    //image = child.gameObject.GetComponent<Image>();
 
-                    if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
-                        ControllerType == ControllerType.Zas)
-                    {
-                        transform.position = new Vector3(0, 0, 0);
-                        image.gameObject.SetActive(true);
-                        image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint, 0f);
-                    }
-                    else
-                    {
-                        // Camera moved.
-                        transform.position = new Vector3(2.04f, 0, 0);
-                        image.gameObject.SetActive(false);
-                    }
+                    //if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+                    //    ControllerType == ControllerType.Zas)
+                    //{
+                    //    _cameraTransform.position = new Vector3(0, 0, 0);
+                    //    image.gameObject.SetActive(true);
+                    //    image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint, 0f);
+                    //}
+                    //else
+                    //{
+                    //    // Camera
+                    //    _cameraTransform.position = new Vector3(2.08f, 0, 0);
+                    //    image.gameObject.SetActive(false);
+                    //}
 
                     break;
 
@@ -276,14 +306,14 @@ public class Main : MonoBehaviour
                         image.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 12.4f), _height);
                         image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint, 0f);
                     }
-                    else if (ControllerType == ControllerType.ClassicPacked)
-                    {
-                        image.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 20.6f), _height);
-                    }
-                    else
-                    {
-                        image.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 25.82f), _height);
-                    }
+                    //else if (ControllerType == ControllerType.ClassicPacked)
+                    //{
+                    //    image.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 20.6f), _height);
+                    //}
+                    //else
+                    //{
+                    //    image.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 25.82f), _height);
+                    //}
 
                     break;
 
@@ -295,16 +325,19 @@ public class Main : MonoBehaviour
                             image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint, 0f);
                             break;
                         case ControllerType.Default:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint - (-Logic.GetPercent(_height, 18.1f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(_rightPoint,
+                                _bottomPoint - (-Logic.GetPercent(_height, 18.1f)), 0f);
                             break;
                         case ControllerType.Zas:
                             image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint, 0f);
                             break;
                         case ControllerType.ClassicPacked:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint - (-Logic.GetPercent(_height, 12.5f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(_rightPoint,
+                                _bottomPoint - (-Logic.GetPercent(_height, 12.5f)), 0f);
                             break;
                         case ControllerType.Classic:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint - (-Logic.GetPercent(_height, 15.6f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(_rightPoint,
+                                _bottomPoint - (-Logic.GetPercent(_height, 15.6f)), 0f);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -316,19 +349,25 @@ public class Main : MonoBehaviour
                     switch (ControllerType)
                     {
                         case ControllerType.DefaultPacked:
-                            image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(_leftPoint,
+                                _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
                             break;
                         case ControllerType.Default:
-                            image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(_leftPoint,
+                                _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
                             break;
                         case ControllerType.Zas:
                             image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint, 0f);
                             break;
                         case ControllerType.ClassicPacked:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 21f), _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);   // 248
+                            image.rectTransform.localPosition = new Vector3(
+                                _rightPoint - Logic.GetPercent(_width, 21f),
+                                _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f); // 248
                             break;
                         case ControllerType.Classic:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 25.82f), _bottomPoint - (-Logic.GetPercent(_height, 15.6f)), 0f); // 215
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 25.82f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 15.6f)), 0f); // 215
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -340,19 +379,29 @@ public class Main : MonoBehaviour
                     switch (ControllerType)
                     {
                         case ControllerType.DefaultPacked:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f), _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
                             break;
                         case ControllerType.Default:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f), _bottomPoint - (-Logic.GetPercent(_height, 36.5f)), 0f);
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 36.5f)), 0f);
                             break;
                         case ControllerType.Zas:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f), _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
                             break;
                         case ControllerType.ClassicPacked:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f), _bottomPoint - (-Logic.GetPercent(_height, 31.2f)), 0f);
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 2.22f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 31.2f)), 0f);
                             break;
                         case ControllerType.Classic:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 7.75f), _bottomPoint - (-Logic.GetPercent(_height, 33.33f)), 0f);
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 7.75f),
+                                    _bottomPoint - (-Logic.GetPercent(_height, 33.33f)), 0f);
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -363,26 +412,31 @@ public class Main : MonoBehaviour
                     switch (ControllerType)
                     {
                         case ControllerType.DefaultPacked:
-                            image.rectTransform.localPosition = new Vector3(_leftPoint + Logic.GetPercent(_width, 2.22f), _bottomPoint, 0f);
+                            image.rectTransform.localPosition = new Vector3(
+                                _leftPoint + Logic.GetPercent(_width, 2.22f), _bottomPoint, 0f);
                             break;
                         case ControllerType.Default:
-                            image.rectTransform.localPosition = new Vector3(_leftPoint + Logic.GetPercent(_width, 2.22f), _bottomPoint, 0f);
+                            image.rectTransform.localPosition = new Vector3(
+                                _leftPoint + Logic.GetPercent(_width, 2.22f), _bottomPoint, 0f);
                             break;
                         case ControllerType.Zas:
-                            image.rectTransform.localPosition = new Vector3(_leftPoint + Logic.GetPercent(_width, 2.22f), _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
+                            image.rectTransform.localPosition = new Vector3(
+                                _leftPoint + Logic.GetPercent(_width, 2.22f),
+                                _bottomPoint - (-Logic.GetPercent(_height, 18.75f)), 0f);
                             break;
                         case ControllerType.ClassicPacked:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 18.73f), _bottomPoint, 0f);    // 267
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 18.73f), _bottomPoint, 0f); // 267
                             break;
                         case ControllerType.Classic:
-                            image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 18.06f), _bottomPoint, 0f);    // 277
+                            image.rectTransform.localPosition =
+                                new Vector3(_rightPoint - Logic.GetPercent(_width, 18.06f), _bottomPoint, 0f); // 277
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                     break;
             }
-
         }
     }
 }

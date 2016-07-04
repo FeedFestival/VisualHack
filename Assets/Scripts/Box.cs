@@ -12,17 +12,33 @@ public class Box : MonoBehaviour
         get { return _sphere; }
         set
         {
-            _sphere = value;
-            if (_sphere == null)
+            if (value == null)
             {
-                if (UpperObject == Obstacle.Player) UpperObject = Obstacle.Nothing;
-                if (RightObject == Obstacle.Player) RightObject = Obstacle.Nothing;
-                if (DownObject == Obstacle.Player) DownObject = Obstacle.Nothing;
-                if (LeftObject == Obstacle.Player) LeftObject = Obstacle.Nothing;
+                if (UpperObject == Obstacle.Player)
+                {
+                    UpperObject = Obstacle.Nothing;
+                    Sphere.DownBox = null;
+                }
+                if (RightObject == Obstacle.Player)
+                {
+                    RightObject = Obstacle.Nothing;
+                    Sphere.LeftBox = null;
+                }
+                if (DownObject == Obstacle.Player)
+                {
+                    DownObject = Obstacle.Nothing;
+                    Sphere.UpBox = null;
+                }
+                if (LeftObject == Obstacle.Player)
+                {
+                    LeftObject = Obstacle.Nothing;
+                    Sphere.RightBox = null;
+                }
             }
+            _sphere = value;
         }
     }
-    
+
     [SerializeField]
     private Direction _playerIsIn;
     [SerializeField]
@@ -37,21 +53,25 @@ public class Box : MonoBehaviour
                 case Direction.Up:
 
                     UpperObject = Obstacle.Player;
+                    Sphere.DownBox = this;
                     break;
 
                 case Direction.Right:
 
                     RightObject = Obstacle.Player;
+                    Sphere.LeftBox = this;
                     break;
 
                 case Direction.Down:
 
                     DownObject = Obstacle.Player;
+                    Sphere.UpBox = this;
                     break;
 
                 case Direction.Left:
 
                     LeftObject = Obstacle.Player;
+                    Sphere.RightBox = this;
                     break;
 
                 default:
@@ -59,7 +79,7 @@ public class Box : MonoBehaviour
             }
         }
     }
-    
+
     public Obstacle UpperObject = Obstacle.Nothing;
     public Obstacle RightObject = Obstacle.Nothing;
     public Obstacle DownObject = Obstacle.Nothing;
