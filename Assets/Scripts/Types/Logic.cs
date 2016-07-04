@@ -19,6 +19,11 @@ namespace Assets.Scripts.Types
         Up = 8, Right = 6, Down = 2, Left = 4
     }
 
+    public enum Obstacle
+    {
+        Player, Box, Solid, Nothing
+    }
+
     public enum ButtonClick
     {
         NextButton, SettingsButton, RedBallButton, Map, SettingsBackButton, MapsBackButton, GameSettingsButton

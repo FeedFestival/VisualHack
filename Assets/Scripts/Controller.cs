@@ -5,7 +5,6 @@ using UnityEngine;
 public class Controller : MonoBehaviour
 {
     private Sphere _sphere;
-    private Box _box;
 
     private Transform _thisTransform;
 
@@ -36,12 +35,9 @@ public class Controller : MonoBehaviour
     public bool PushingFromUp;
     public bool PushingFromDown;
 
-    public void Initialize(object obj)
+    public void Initialize(Sphere obj)
     {
-        if (obj is Sphere)
-            _sphere = obj as Sphere;
-        if (obj is Box)
-            _box = obj as Box;
+        _sphere = obj;
 
         _thisTransform = transform;
 
@@ -67,31 +63,23 @@ public class Controller : MonoBehaviour
         {
             case Direction.Up:
 
-                if (_sphere)
-                    return _sphere.UserPressedUp && _sphere.UpPushingLocked == false;
-                //return _box.Sphere && _box.UpPushingLocked == false;
-                return _box.Sphere && _box.Sphere.UserPressedUp && _box.UpPushingLocked == false;
+                return _sphere.UserPressedUp && _sphere.UpPushingLocked == false;
+            //return _box.Sphere && _box.UpPushingLocked == false;
 
             case Direction.Right:
-
-                if (_sphere)
-                    return _sphere.UserPressedRight && _sphere.RightPushingLocked == false;
-                //return _box.Sphere && _box.RightPushingLocked == false;
-                return _box.Sphere && _box.Sphere.UserPressedRight && _box.RightPushingLocked == false;
+                
+                return _sphere.UserPressedRight && _sphere.RightPushingLocked == false;
+            //return _box.Sphere && _box.RightPushingLocked == false;
 
             case Direction.Down:
-
-                if (_sphere)
-                    return _sphere.UserPressedDown && _sphere.DownPushingLocked == false;
-                //return _box.Sphere && _box.DownPushingLocked == false;
-                return _box.Sphere && _box.Sphere.UserPressedDown && _box.DownPushingLocked == false;
+                
+                return _sphere.UserPressedDown && _sphere.DownPushingLocked == false;
+            //return _box.Sphere && _box.DownPushingLocked == false;
 
             case Direction.Left:
-
-                if (_sphere)
-                    return _sphere.UserPressedLeft && _sphere.LeftPushingLocked == false;
-                //return _box.Sphere && _box.LeftPushingLocked == false;
-                return _box.Sphere && _box.Sphere.UserPressedLeft && _box.LeftPushingLocked == false;
+                
+                return _sphere.UserPressedLeft && _sphere.LeftPushingLocked == false;
+            //return _box.Sphere && _box.LeftPushingLocked == false;
 
             default:
                 throw new ArgumentOutOfRangeException("direction", direction, null);
@@ -103,28 +91,20 @@ public class Controller : MonoBehaviour
         switch (direction)
         {
             case Direction.Up:
-
-                if (_sphere)
-                    return _sphere.UpPushingLocked == false;
-                return _box.UpPushingLocked == false;
+                
+                return _sphere.UpPushingLocked == false;
 
             case Direction.Right:
-
-                if (_sphere)
-                    return _sphere.RightPushingLocked == false;
-                return _box.RightPushingLocked == false;
+                
+                return _sphere.RightPushingLocked == false;
 
             case Direction.Down:
-
-                if (_sphere)
-                    return _sphere.DownPushingLocked == false;
-                return _box.DownPushingLocked == false;
+                
+                return _sphere.DownPushingLocked == false;
 
             case Direction.Left:
-
-                if (_sphere)
-                    return _sphere.LeftPushingLocked == false;
-                return _box.LeftPushingLocked == false;
+                
+                return _sphere.LeftPushingLocked == false;
 
             default:
                 throw new ArgumentOutOfRangeException("direction", direction, null);
@@ -219,30 +199,26 @@ public class Controller : MonoBehaviour
             PushingFromLeft = false;
         }
     }
-    
+
     private void LockPushing(string tag, bool value)
     {
         switch (tag)
         {
             case "SolidUp":
-                if (_sphere) _sphere.UpPushingLocked = value;
-                else _box.UpPushingLocked = value;
+                _sphere.UpPushingLocked = value;
                 break;
             case "SolidRight":
-                if (_sphere) _sphere.RightPushingLocked = value;
-                else _box.RightPushingLocked = value;
+                _sphere.RightPushingLocked = value;
                 break;
             case "SolidDown":
-                if (_sphere) _sphere.DownPushingLocked = value;
-                else _box.DownPushingLocked = value;
+                _sphere.DownPushingLocked = value;
                 break;
             case "SolidLeft":
-                if (_sphere) _sphere.LeftPushingLocked = value;
-                else _box.LeftPushingLocked = value;
+                _sphere.LeftPushingLocked = value;
                 break;
         }
     }
-    
+
     public void Push(Direction directionIndex)
     {
         var direction = (Direction)directionIndex;
@@ -250,26 +226,22 @@ public class Controller : MonoBehaviour
         {
             case Direction.Up:
 
-                if (_sphere) _sphere.UpPushingLocked = LockUpPushing;
-                else _box.UpPushingLocked = LockUpPushing;
+                _sphere.UpPushingLocked = LockUpPushing;
                 break;
 
             case Direction.Right:
 
-                if (_sphere) _sphere.RightPushingLocked = LockRightPushing;
-                else _box.RightPushingLocked = LockRightPushing;
+                _sphere.RightPushingLocked = LockRightPushing;
                 break;
 
             case Direction.Down:
 
-                if (_sphere) _sphere.DownPushingLocked = LockDownPushing;
-                else _box.DownPushingLocked = LockDownPushing;
+                _sphere.DownPushingLocked = LockDownPushing;
                 break;
 
             case Direction.Left:
 
-                if (_sphere) _sphere.LeftPushingLocked = LockLeftPushing;
-                else _box.LeftPushingLocked = LockLeftPushing;
+                _sphere.LeftPushingLocked = LockLeftPushing;
                 break;
 
             default:
@@ -284,26 +256,22 @@ public class Controller : MonoBehaviour
         {
             case Direction.Up:
 
-                if (_sphere) _sphere.UpPushingLocked = true;
-                else _box.UpPushingLocked = true;
+                _sphere.UpPushingLocked = true;
                 break;
 
             case Direction.Right:
 
-                if (_sphere) _sphere.RightPushingLocked = true;
-                else _box.RightPushingLocked = true;
+                _sphere.RightPushingLocked = true;
                 break;
 
             case Direction.Down:
 
-                if (_sphere) _sphere.DownPushingLocked = true;
-                else _box.DownPushingLocked = true;
+                _sphere.DownPushingLocked = true;
                 break;
 
             case Direction.Left:
 
-                if (_sphere) _sphere.LeftPushingLocked = true;
-                else _box.LeftPushingLocked = true;
+                _sphere.LeftPushingLocked = true;
                 break;
 
             default:
