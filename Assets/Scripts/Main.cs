@@ -44,7 +44,7 @@ public class Main : MonoBehaviour
     public GameObject MapsPanel;
 
     [Header("GameView")]
-    public Controller Controller;
+    public Sphere Sphere;
     public GameObject GameViewPanel;
     public GameObject Game;
 
@@ -84,7 +84,7 @@ public class Main : MonoBehaviour
 
         SetupGameUi();
 
-        Controller.Initialize(this);
+        Sphere.Initialize(this);
     }
 
     public void ButtonClicked(int button)

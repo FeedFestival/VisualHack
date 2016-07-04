@@ -15,89 +15,87 @@ public class BoxCollider : MonoBehaviour
         ColliderPosition = colPosition;
     }
 
-    void OnTriggerEnter(Collider obj)
+    void OnTriggerEnter(Collider objC)
     {
-        var objName = obj.gameObject.name;
-
         switch (ColliderPosition)
         {
             case Direction.Up:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    _box.Player = obj.transform.parent.gameObject.GetComponent<Controller>();
+                    _box.Sphere = objC.transform.parent.gameObject.GetComponent<Sphere>();
 
-                    if (_box.LockDownPushing == false)
-                        _box.Push(Direction.Down);
+                    if (_box.Controller.LockDownPushing == false)
+                        _box.Controller.Push(Direction.Down);
                     else
-                        _box.Player.LockPushing(Direction.Down);
+                        _box.Sphere.Controller.LockPushing(Direction.Down);
                 }
                 // Stop pushing up !
-                if (objName == "down_Side" || objName == "BorderUp")
+                if (objC.CompareTag("BoxDown") || objC.CompareTag("SolidUp"))
                 {
-                    _box.LockPushing(Direction.Up);
-                    if (_box.Player && _box.Player.PushingFromDown)
-                        _box.Player.LockPushing(Direction.Up);
+                    _box.Controller.LockPushing(Direction.Up);
+                    if (_box.Sphere && _box.Sphere.Controller.PushingFromDown)
+                        _box.Sphere.Controller.LockPushing(Direction.Up);
                 }
                 break;
 
             case Direction.Right:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    _box.Player = obj.transform.parent.gameObject.GetComponent<Controller>();
+                    _box.Sphere = objC.transform.parent.gameObject.GetComponent<Sphere>();
 
-                    if (_box.LockLeftPushing == false)
-                        _box.Push(Direction.Left);
+                    if (_box.Controller.LockLeftPushing == false)
+                        _box.Controller.Push(Direction.Left);
                     else
-                        _box.Player.LockPushing(Direction.Left);
+                        _box.Sphere.Controller.LockPushing(Direction.Left);
                 }
                 // Stop pushing right !
-                if (objName == "left_Side" || objName == "BorderRight")
+                if (objC.CompareTag("BoxLeft") || objC.CompareTag("SolidRight"))
                 {
-                    _box.LockPushing(Direction.Right);
-                    if (_box.Player && _box.Player.PushingFromLeft)
-                        _box.Player.LockPushing(Direction.Right);
+                    _box.Controller.LockPushing(Direction.Right);
+                    if (_box.Sphere && _box.Sphere.Controller.PushingFromLeft)
+                        _box.Sphere.Controller.LockPushing(Direction.Right);
                 }
                 break;
 
             case Direction.Down:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    _box.Player = obj.transform.parent.gameObject.GetComponent<Controller>();
+                    _box.Sphere = objC.transform.parent.gameObject.GetComponent<Sphere>();
 
-                    if (_box.LockUpPushing == false)
-                        _box.Push(Direction.Up);
+                    if (_box.Controller.LockUpPushing == false)
+                        _box.Controller.Push(Direction.Up);
                     else
-                        _box.Player.LockPushing(Direction.Up);
+                        _box.Sphere.Controller.LockPushing(Direction.Up);
                 }
                 // Stop pushing down !
-                if (objName == "up_Side" || objName == "BorderDown")
+                if (objC.CompareTag("BoxUp") || objC.CompareTag("SolidDown"))
                 {
-                    _box.LockPushing(Direction.Down);
-                    if (_box.Player && _box.Player.PushingFromUp)
-                        _box.Player.LockPushing(Direction.Down);
+                    _box.Controller.LockPushing(Direction.Down);
+                    if (_box.Sphere && _box.Sphere.Controller.PushingFromUp)
+                        _box.Sphere.Controller.LockPushing(Direction.Down);
                 }
                 break;
 
             case Direction.Left:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    _box.Player = obj.transform.parent.gameObject.GetComponent<Controller>();
+                    _box.Sphere = objC.transform.parent.gameObject.GetComponent<Sphere>();
 
-                    if (_box.LockRightPushing == false)
-                        _box.Push(Direction.Right);
+                    if (_box.Controller.LockRightPushing == false)
+                        _box.Controller.Push(Direction.Right);
                     else
-                        _box.Player.LockPushing(Direction.Right);
+                        _box.Sphere.Controller.LockPushing(Direction.Right);
                 }
                 // Stop pushing left !
-                if (objName == "right_Side" || objName == "BorderLeft")
+                if (objC.CompareTag("BoxRight") || objC.CompareTag("SolidLeft"))
                 {
-                    _box.LockPushing(Direction.Left);
-                    if (_box.Player && _box.Player.PushingFromRight)
-                        _box.Player.LockPushing(Direction.Left);
+                    _box.Controller.LockPushing(Direction.Left);
+                    if (_box.Sphere && _box.Sphere.Controller.PushingFromRight)
+                        _box.Sphere.Controller.LockPushing(Direction.Left);
                 }
                 break;
 
@@ -106,62 +104,61 @@ public class BoxCollider : MonoBehaviour
         }
     }
 
-    void OnTriggerExit(Collider obj)
+    void OnTriggerExit(Collider objC)
     {
-        var objName = obj.gameObject.name;
         switch (ColliderPosition)
         {
             case Direction.Up:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    // Player can push down again !
-                    if (_box.Player)
-                        _box.Player.DontLockPushing(Direction.Down);
-                    _box.Player = null;
-                    _box.DontPush(Direction.Down);
+                    // Sphere can push down again !
+                    if (_box.Sphere)
+                        _box.Sphere.Controller.DontLockPushing(Direction.Down);
+                    _box.Sphere = null;
+                    _box.Controller.DontPush(Direction.Down);
                 }
-                if (objName == "down_Side" || objName == "BorderUp")
-                    _box.DontLockPushing(Direction.Up);
+                if (objC.CompareTag("BoxDown") || objC.CompareTag("SolidUp"))
+                    _box.Controller.DontLockPushing(Direction.Up);
                 break;
 
             case Direction.Right:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    // Player can push left again !
-                    _box.Player.DontLockPushing(Direction.Left);
-                    _box.Player = null;
-                    _box.DontPush(Direction.Left);
+                    // Sphere can push left again !
+                    _box.Sphere.Controller.DontLockPushing(Direction.Left);
+                    _box.Sphere = null;
+                    _box.Controller.DontPush(Direction.Left);
                 }
-                if (objName == "left_Side" || objName == "Border_Right")
-                    _box.DontLockPushing(Direction.Right);
+                if (objC.CompareTag("BoxLeft") || objC.CompareTag("SolidRight"))
+                    _box.Controller.DontLockPushing(Direction.Right);
                 break;
 
             case Direction.Down:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    // Player can push up again !
-                    _box.Player.DontLockPushing(Direction.Up);
-                    _box.Player = null;
-                    _box.DontPush(Direction.Up);
+                    // Sphere can push up again !
+                    _box.Sphere.Controller.DontLockPushing(Direction.Up);
+                    _box.Sphere = null;
+                    _box.Controller.DontPush(Direction.Up);
                 }
-                if (objName == "up_Side" || objName == "BorderDown")
-                    _box.DontLockPushing(Direction.Down);
+                if (objC.CompareTag("BoxUp") || objC.CompareTag("SolidDown"))
+                    _box.Controller.DontLockPushing(Direction.Down);
                 break;
 
             case Direction.Left:
 
-                if (objName == "Sphere")
+                if (objC.CompareTag("Sphere"))
                 {
-                    // Player can push right again !
-                    _box.Player.DontLockPushing(Direction.Right);
-                    _box.Player = null;
-                    _box.DontPush(Direction.Right);
+                    // Sphere can push right again !
+                    _box.Sphere.Controller.DontLockPushing(Direction.Right);
+                    _box.Sphere = null;
+                    _box.Controller.DontPush(Direction.Right);
                 }
-                if (objName == "right_Side" || objName == "BorderLeft")
-                    _box.DontLockPushing(Direction.Left);
+                if (objC.CompareTag("BoxRight") || objC.CompareTag("SolidLeft"))
+                    _box.Controller.DontLockPushing(Direction.Left);
                 break;
 
             default:
