@@ -4,30 +4,19 @@ using UnityEngine;
 
 public class Controller : MonoBehaviour
 {
-    private Main _main;
+    private Sphere _sphere;
+    private Box _box;
 
-    private Transform _sphereTransform;
-
-    public Move GoDirection;
+    private Transform _thisTransform;
 
     // Input logic variables
     private float _time;
     private readonly float _ratio = 0.02f;
     private readonly float _speed = 3f;
 
-    // user input
-    private bool _userPressedRight;
-    private bool _userPressedLeft;
-    private bool _userPressedUp;
-    private bool _userPressedDown;
-
-    public bool RightPushingLocked;
     private bool _pushRight;
-    public bool LeftPushingLocked;
     private bool _pushLeft;
-    public bool UpPushingLocked;
     private bool _pushUp;
-    public bool DownPushingLocked;
     private bool _pushDown;
 
     public bool LockRightPushing;
@@ -47,106 +36,117 @@ public class Controller : MonoBehaviour
     public bool PushingFromUp;
     public bool PushingFromDown;
 
-    public void Initialize(Main main)
+    public void Initialize(object obj)
     {
-        _main = main;
+        if (obj is Sphere)
+            _sphere = obj as Sphere;
+        if (obj is Box)
+            _box = obj as Box;
 
-        _sphereTransform = transform;
+        _thisTransform = transform;
 
         CalculateNewCoord();
     }
 
-    public void SelectControllerType(int controllerType)
-    {
-        _main.ControllerType = (ControllerType)controllerType;
-        _main.DataService.UpdateUserControllerType(controllerType);
-
-        _main.ButtonClicked((int)ButtonClick.SettingsBackButton);
-    }
-
     private void MoveUpdate(Vector3 endMarker, ref bool referenceBool)
     {
-        _sphereTransform.position = Vector3.Lerp(_startMarker, endMarker, _time);
+        _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _time);
         _time = _time + _ratio * _speed;
 
         if (!(_time >= 1)) return;
 
         _time = 0f;
-        _sphereTransform.position = endMarker;
+        _thisTransform.position = endMarker;
         CalculateNewCoord();
         referenceBool = false;
     }
 
-
-    public void MoveDirection(int moveIndex)
+    bool CheckUserPress(Direction direction)
     {
-        GoDirection = (Move)moveIndex;
-        switch (GoDirection)
+        switch (direction)
         {
-            case Move.Up:
+            case Direction.Up:
 
-                _userPressedUp = true;
-                break;
+                if (_sphere)
+                    return _sphere.UserPressedUp && _sphere.UpPushingLocked == false;
+                //return _box.Sphere && _box.UpPushingLocked == false;
+                return _box.Sphere && _box.Sphere.UserPressedUp && _box.UpPushingLocked == false;
 
-            case Move.Right:
+            case Direction.Right:
 
-                _userPressedRight = true;
-                break;
+                if (_sphere)
+                    return _sphere.UserPressedRight && _sphere.RightPushingLocked == false;
+                //return _box.Sphere && _box.RightPushingLocked == false;
+                return _box.Sphere && _box.Sphere.UserPressedRight && _box.RightPushingLocked == false;
 
-            case Move.Down:
+            case Direction.Down:
 
-                _userPressedDown = true;
-                break;
+                if (_sphere)
+                    return _sphere.UserPressedDown && _sphere.DownPushingLocked == false;
+                //return _box.Sphere && _box.DownPushingLocked == false;
+                return _box.Sphere && _box.Sphere.UserPressedDown && _box.DownPushingLocked == false;
 
-            case Move.Left:
+            case Direction.Left:
 
-                _userPressedLeft = true;
-                break;
+                if (_sphere)
+                    return _sphere.UserPressedLeft && _sphere.LeftPushingLocked == false;
+                //return _box.Sphere && _box.LeftPushingLocked == false;
+                return _box.Sphere && _box.Sphere.UserPressedLeft && _box.LeftPushingLocked == false;
+
+            default:
+                throw new ArgumentOutOfRangeException("direction", direction, null);
         }
     }
 
-    public void StopDirection(int moveIndex)
+    bool CheckLockedPush(Direction direction)
     {
-        switch ((Move)moveIndex)
+        switch (direction)
         {
-            case Move.Up:
+            case Direction.Up:
 
-                _userPressedUp = false;
-                break;
+                if (_sphere)
+                    return _sphere.UpPushingLocked == false;
+                return _box.UpPushingLocked == false;
 
-            case Move.Right:
+            case Direction.Right:
 
-                _userPressedRight = false;
-                break;
+                if (_sphere)
+                    return _sphere.RightPushingLocked == false;
+                return _box.RightPushingLocked == false;
 
-            case Move.Down:
+            case Direction.Down:
 
-                _userPressedDown = false;
-                break;
+                if (_sphere)
+                    return _sphere.DownPushingLocked == false;
+                return _box.DownPushingLocked == false;
 
-            case Move.Left:
+            case Direction.Left:
 
-                _userPressedLeft = false;
-                break;
+                if (_sphere)
+                    return _sphere.LeftPushingLocked == false;
+                return _box.LeftPushingLocked == false;
+
+            default:
+                throw new ArgumentOutOfRangeException("direction", direction, null);
         }
     }
 
     void FixedUpdate()
     {
         if (_pushLeft == false && _pushUp == false && _pushDown == false)
-            if ((Input.GetKey(KeyCode.D) || _userPressedRight) && RightPushingLocked == false)
+            if (CheckUserPress(Direction.Right))
                 _pushRight = true;
 
         if (_pushRight == false && _pushUp == false && _pushDown == false)
-            if ((Input.GetKey(KeyCode.A) || _userPressedLeft) && LeftPushingLocked == false)
+            if (CheckUserPress(Direction.Left))
                 _pushLeft = true;
 
         if (_pushRight == false && _pushLeft == false && _pushDown == false)
-            if ((Input.GetKey(KeyCode.W) || _userPressedUp) && UpPushingLocked == false)
+            if (CheckUserPress(Direction.Up))
                 _pushUp = true;
 
         if (_pushRight == false && _pushLeft == false && _pushUp == false)
-            if ((Input.GetKey(KeyCode.S) || _userPressedDown) && DownPushingLocked == false)
+            if (CheckUserPress(Direction.Down))
                 _pushDown = true;
 
         if (_pushRight)
@@ -161,11 +161,11 @@ public class Controller : MonoBehaviour
 
     public void CalculateNewCoord()
     {
-        _startMarker = _sphereTransform.position;
-        _endMarkerRight = new Vector3(_sphereTransform.position.x + 1f, _sphereTransform.position.y, _sphereTransform.position.z);
-        _endMarkerLeft = new Vector3(_sphereTransform.position.x - 1f, _sphereTransform.position.y, _sphereTransform.position.z);
-        _endMarkerUp = new Vector3(_sphereTransform.position.x, _sphereTransform.position.y + 1f, _sphereTransform.position.z);
-        _endMarkerDown = new Vector3(_sphereTransform.position.x, _sphereTransform.position.y - 1f, _sphereTransform.position.z);
+        _startMarker = _thisTransform.position;
+        _endMarkerRight = new Vector3(_thisTransform.position.x + 1f, _thisTransform.position.y, _thisTransform.position.z);
+        _endMarkerLeft = new Vector3(_thisTransform.position.x - 1f, _thisTransform.position.y, _thisTransform.position.z);
+        _endMarkerUp = new Vector3(_thisTransform.position.x, _thisTransform.position.y + 1f, _thisTransform.position.z);
+        _endMarkerDown = new Vector3(_thisTransform.position.x, _thisTransform.position.y - 1f, _thisTransform.position.z);
     }
 
     /***************************\//----------------------------------------------\
@@ -176,68 +176,73 @@ public class Controller : MonoBehaviour
     \***************************/
     // ---------------------------------------------\
 
-    void OnTriggerEnter(Collider obj)
+    void OnTriggerEnter(Collider foreignObjectCollider)
     {
-        LockPushing(obj.gameObject.name, true);
-        
-        if (obj.gameObject.name == "right_Side")
-        {
-            PushingFromRight = true;
-        }
-        if (obj.gameObject.name == "left_Side")
-        {
-            PushingFromLeft = true;
-        }
-        if (obj.gameObject.name == "up_Side")
+        LockPushing(foreignObjectCollider.gameObject.tag, true);
+
+        if (foreignObjectCollider.CompareTag("BoxUp"))
         {
             PushingFromUp = true;
         }
-        if (obj.gameObject.name == "down_Side")
+        if (foreignObjectCollider.CompareTag("BoxRight"))
+        {
+            PushingFromRight = true;
+        }
+        if (foreignObjectCollider.CompareTag("BoxDown"))
         {
             PushingFromDown = true;
         }
+        if (foreignObjectCollider.CompareTag("BoxLeft"))
+        {
+            PushingFromLeft = true;
+        }
     }
-    void OnTriggerExit(Collider obj)
+
+    void OnTriggerExit(Collider foreignObjectCollider)
     {
-        LockPushing(obj.gameObject.name, false);
-        
-        if (obj.gameObject.name == "right_Side")
-        {
-            PushingFromRight = false;
-        }
-        if (obj.gameObject.name == "left_Side")
-        {
-            PushingFromLeft = false;
-        }
-        if (obj.gameObject.name == "up_Side")
+        LockPushing(foreignObjectCollider.gameObject.tag, false);
+
+        if (foreignObjectCollider.CompareTag("BoxUp"))
         {
             PushingFromUp = false;
         }
-        if (obj.gameObject.name == "down_Side")
+        if (foreignObjectCollider.CompareTag("BoxRight"))
+        {
+            PushingFromRight = false;
+        }
+        if (foreignObjectCollider.CompareTag("BoxDown"))
         {
             PushingFromDown = false;
         }
-    }
-
-    private void LockPushing(string goName, bool value)
-    {
-        switch (goName)
+        if (foreignObjectCollider.CompareTag("BoxLeft"))
         {
-            case "BorderUp":
-                UpPushingLocked = value;
+            PushingFromLeft = false;
+        }
+    }
+    
+    private void LockPushing(string tag, bool value)
+    {
+        switch (tag)
+        {
+            case "SolidUp":
+                if (_sphere) _sphere.UpPushingLocked = value;
+                else _box.UpPushingLocked = value;
                 break;
-            case "BorderRight":
-                RightPushingLocked = value;
+            case "SolidRight":
+                if (_sphere) _sphere.RightPushingLocked = value;
+                else _box.RightPushingLocked = value;
                 break;
-            case "BorderDown":
-                DownPushingLocked = value;
+            case "SolidDown":
+                if (_sphere) _sphere.DownPushingLocked = value;
+                else _box.DownPushingLocked = value;
                 break;
-            case "BorderLeft":
-                LeftPushingLocked = value;
+            case "SolidLeft":
+                if (_sphere) _sphere.LeftPushingLocked = value;
+                else _box.LeftPushingLocked = value;
                 break;
         }
     }
-
+    
     public void Push(Direction directionIndex)
     {
         var direction = (Direction)directionIndex;
@@ -245,22 +250,26 @@ public class Controller : MonoBehaviour
         {
             case Direction.Up:
 
-                UpPushingLocked = LockUpPushing != false;
+                if (_sphere) _sphere.UpPushingLocked = LockUpPushing;
+                else _box.UpPushingLocked = LockUpPushing;
                 break;
 
             case Direction.Right:
-                
-                RightPushingLocked = LockRightPushing != false;
+
+                if (_sphere) _sphere.RightPushingLocked = LockRightPushing;
+                else _box.RightPushingLocked = LockRightPushing;
                 break;
 
             case Direction.Down:
 
-                DownPushingLocked = LockDownPushing != false;
+                if (_sphere) _sphere.DownPushingLocked = LockDownPushing;
+                else _box.DownPushingLocked = LockDownPushing;
                 break;
 
             case Direction.Left:
 
-                LeftPushingLocked = LockLeftPushing != false;
+                if (_sphere) _sphere.LeftPushingLocked = LockLeftPushing;
+                else _box.LeftPushingLocked = LockLeftPushing;
                 break;
 
             default:
@@ -275,22 +284,26 @@ public class Controller : MonoBehaviour
         {
             case Direction.Up:
 
-                UpPushingLocked = true;
+                if (_sphere) _sphere.UpPushingLocked = true;
+                else _box.UpPushingLocked = true;
                 break;
 
             case Direction.Right:
 
-                RightPushingLocked = true;
+                if (_sphere) _sphere.RightPushingLocked = true;
+                else _box.RightPushingLocked = true;
                 break;
 
             case Direction.Down:
 
-                DownPushingLocked = true;
+                if (_sphere) _sphere.DownPushingLocked = true;
+                else _box.DownPushingLocked = true;
                 break;
 
             case Direction.Left:
 
-                LeftPushingLocked = true;
+                if (_sphere) _sphere.LeftPushingLocked = true;
+                else _box.LeftPushingLocked = true;
                 break;
 
             default:
@@ -307,22 +320,22 @@ public class Controller : MonoBehaviour
         switch (direction)
         {
             case Direction.Up:
-                
+
                 LockUpPushing = true;
                 break;
 
             case Direction.Right:
-                
+
                 LockRightPushing = true;
                 break;
 
             case Direction.Down:
-                
+
                 LockDownPushing = true;
                 break;
 
             case Direction.Left:
-                
+
                 LockLeftPushing = true;
                 break;
 
@@ -360,15 +373,5 @@ public class Controller : MonoBehaviour
                 throw new ArgumentOutOfRangeException();
         }
         Push(direction);
-    }
-
-    public void Death()
-    {
-        Debug.Log("Sphere - Play_Animation (Death by Water).\n");
-
-        RightPushingLocked = true;
-        LeftPushingLocked = true;
-        UpPushingLocked = true;
-        DownPushingLocked = true;
     }
 }
