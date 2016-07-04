@@ -44,8 +44,8 @@ public class Main : MonoBehaviour
     public GameObject MapsPanel;
 
     [Header("GameView")]
+    public Controller Controller;
     public GameObject GameViewPanel;
-
     public GameObject Game;
 
     private float _width;
@@ -70,6 +70,7 @@ public class Main : MonoBehaviour
         MapsPanel.SetActive(false);
 
         GameViewPanel.SetActive(false);
+        Game.SetActive(false);
 
         // Resolutions.
 
@@ -83,7 +84,7 @@ public class Main : MonoBehaviour
 
         SetupGameUi();
 
-        GetComponent<Controller>().Initialize(this);
+        Controller.Initialize(this);
     }
 
     public void ButtonClicked(int button)
@@ -141,6 +142,7 @@ public class Main : MonoBehaviour
             case ButtonClick.GameSettingsButton:
 
                 GameViewPanel.SetActive(false);
+                Game.SetActive(false);
 
                 // for now
                 ShowMainMenu();
@@ -172,6 +174,14 @@ public class Main : MonoBehaviour
     {
         _debugText = string.Empty;
         DebugContainer.SetActive(!DebugContainer.activeSelf);
+    }
+
+    public void SelectControllerType(int controllerType)
+    {
+        ControllerType = (ControllerType)controllerType;
+        DataService.UpdateUserControllerType(controllerType);
+
+        ButtonClicked((int)ButtonClick.SettingsBackButton);
     }
 
     public void SetupGameUi()
@@ -251,7 +261,8 @@ public class Main : MonoBehaviour
                     }
                     else
                     {
-                        transform.position = new Vector3(26.4f, 0, 0);
+                        // Camera moved.
+                        transform.position = new Vector3(2.04f, 0, 0);
                         image.gameObject.SetActive(false);
                     }
 
