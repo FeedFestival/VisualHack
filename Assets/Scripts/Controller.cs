@@ -9,22 +9,20 @@ public class Controller : MonoBehaviour
     private Transform _thisTransform;
 
     // Input logic variables
-    private float _time;
-    private readonly float _ratio = 0.02f;
-    private readonly float _speed = 3f;
 
     private bool _pushRight;
     private bool _pushLeft;
     private bool _pushUp;
     private bool _pushDown;
-    
+
     // predefined
+    private float _lerpTime;
     private Vector3 _startMarker;
     private Vector3 _endMarkerRight;
     private Vector3 _endMarkerLeft;
     private Vector3 _endMarkerUp;
     private Vector3 _endMarkerDown;
-    
+
     public Obstacle UpperObject = Obstacle.Nothing;
     public Obstacle RightObject = Obstacle.Nothing;
     public Obstacle DownObject = Obstacle.Nothing;
@@ -41,12 +39,12 @@ public class Controller : MonoBehaviour
 
     private void MoveUpdate(Vector3 endMarker, ref bool referenceBool)
     {
-        _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _time);
-        _time = _time + _ratio * _speed;
+        _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _lerpTime);
+        _lerpTime = _lerpTime + Logic.LerpRatio * Logic.LerpSpeed;
 
-        if (!(_time >= 1)) return;
+        if (!(_lerpTime >= 1)) return;
 
-        _time = 0f;
+        _lerpTime = 0f;
         _thisTransform.position = endMarker;
         CalculateNewCoord();
         referenceBool = false;
@@ -66,7 +64,7 @@ public class Controller : MonoBehaviour
                         return true;
                 }
                 return false;
-                
+
             case Direction.Right:
 
                 if (_sphere.UserPressedRight)
@@ -77,7 +75,7 @@ public class Controller : MonoBehaviour
                         return true;
                 }
                 return false;
-                
+
             case Direction.Down:
 
                 if (_sphere.UserPressedDown)
@@ -88,7 +86,7 @@ public class Controller : MonoBehaviour
                         return true;
                 }
                 return false;
-            
+
             case Direction.Left:
 
                 if (_sphere.UserPressedLeft)
@@ -99,12 +97,12 @@ public class Controller : MonoBehaviour
                         return true;
                 }
                 return false;
-            
+
             default:
                 throw new ArgumentOutOfRangeException("direction", direction, null);
         }
     }
-    
+
     void FixedUpdate()
     {
         if (_pushLeft == false && _pushUp == false && _pushDown == false)

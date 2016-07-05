@@ -55,8 +55,21 @@ namespace Assets.Scripts.Types
         BoxLeft,
     }
 
+    public enum ObjectState
+    {
+        Deactivated, Activated, NoPower
+    }
+
+    public enum ZoneType
+    {
+        Pit, Solid, Walkable
+    }
+
     public static class Logic
     {
+        public static readonly float LerpRatio = 0.02f;
+        public static readonly float LerpSpeed = 3f;
+
         public static float GetPercent(float value, float percent)
         {
             return (value / 100f) * percent;

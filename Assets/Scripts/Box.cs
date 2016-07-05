@@ -88,16 +88,13 @@ public class Box : MonoBehaviour
     // moving variables
 
     private Transform _thisTransform;
-
-    private float _time;
-    private readonly float _ratio = 0.02f;
-    private readonly float _speed = 3f;
-
+    
     private bool _pushRight;
     private bool _pushLeft;
     private bool _pushUp;
     private bool _pushDown;
 
+    private float _lerpTime;
     private Vector3 _startMarker;
     private Vector3 _endMarkerRight;
     private Vector3 _endMarkerLeft;
@@ -148,12 +145,12 @@ public class Box : MonoBehaviour
 
     private void MoveUpdate(Vector3 endMarker, ref bool referenceBool)
     {
-        _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _time);
-        _time = _time + _ratio * _speed;
+        _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _lerpTime);
+        _lerpTime = _lerpTime + Logic.LerpRatio * Logic.LerpSpeed;
 
-        if (!(_time >= 1)) return;
+        if (!(_lerpTime >= 1)) return;
 
-        _time = 0f;
+        _lerpTime = 0f;
         _thisTransform.position = endMarker;
         CalculateNewCoord();
         referenceBool = false;
