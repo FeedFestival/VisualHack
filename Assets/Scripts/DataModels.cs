@@ -75,21 +75,6 @@ public class MapTile
     }
 
     [Ignore]
-    public Misc Misc
-    {
-        get { return (Misc)MiscId; }
-        set
-        {
-            var misc = value;
-            MiscId = (int)misc;
-        }
-    }
-    public int MiscId
-    {
-        get; set;
-    }
-
-    [Ignore]
     public PuzzleObject PuzzleObject
     {
         get { return (PuzzleObject)PuzzleObjectId; }
@@ -104,11 +89,29 @@ public class MapTile
         get; set;
     }
 
-
-    public float Rotation { get; set; }
-
     public float X { get; set; }
     public float Y { get; set; }
+
+    public int BridgeId { get; set; }
+
+    // Misc
+    [Ignore]
+    public Misc Misc
+    {
+        get { return (Misc)MiscId; }
+        set
+        {
+            var misc = value;
+            MiscId = (int)misc;
+        }
+    }
+    public int MiscId
+    {
+        get; set;
+    }
+    public float Rotation { get; set; }
+    public float Z { get; set; }
+    // Misc - END
 
     public string PrintObject(TileType tileType)
     {

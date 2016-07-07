@@ -5,6 +5,8 @@ using Assets.Scripts.Types;
 
 public class Bridge : MonoBehaviour
 {
+    [SerializeField] public int Id;
+
     private Transform _bridgeRoadTransform;
 
     [SerializeField]
@@ -27,7 +29,7 @@ public class Bridge : MonoBehaviour
             _startLerp = true;
         }
     }
-
+    
     [SerializeField]
     private List<Zone> Zones;
 

@@ -79,7 +79,7 @@ public class Box : MonoBehaviour
             }
         }
     }
-
+    
     public Obstacle UpperObject = Obstacle.Nothing;
     public Obstacle RightObject = Obstacle.Nothing;
     public Obstacle DownObject = Obstacle.Nothing;
@@ -102,7 +102,7 @@ public class Box : MonoBehaviour
     private Vector3 _endMarkerDown;
 
     // Use this for initialization
-    void Awake()
+    public void Initialize()
     {
         _thisTransform = transform;
         Transform[] allChildren = _thisTransform.GetComponentsInChildren<Transform>(true);

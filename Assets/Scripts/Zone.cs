@@ -6,13 +6,7 @@ using Assets.Scripts.Types;
 public class Zone : MonoBehaviour
 {
     public ZoneType ZoneType;
-
-    // Use this for initialization
-    void Start()
-    {
-        //if Type Solid
-    }
-
+    
     void OnTriggerEnter(Collider objC)
     {
         switch (ZoneType)
@@ -21,7 +15,7 @@ public class Zone : MonoBehaviour
 
                 if (objC.CompareTag("Sphere"))
                 {
-                    Debug.Log("Dead");
+                    objC.transform.parent.GetComponent<Sphere>().Main.InitGame();
                 }
                 break;
 

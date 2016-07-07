@@ -67,6 +67,12 @@ public class DataService
 
     }
 
+    public void CleanUpUsers()
+    {
+        _connection.DropTable<User>();
+        _connection.CreateTable<User>();
+    }
+
     public void CreateDB()
     {
         _connection.DropTable<User>();

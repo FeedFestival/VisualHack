@@ -29,6 +29,8 @@ public class Main : MonoBehaviour
         }
     }
 
+    public Image LoadingImage;
+
     [Header("Start")]
     public GameObject StartPanel;
 
@@ -48,10 +50,87 @@ public class Main : MonoBehaviour
     [Header("Maps")]
     public GameObject MapsPanel;
 
+    public int CurrentMapId;
+
     [Header("GameView")]
-    public Sphere Sphere;
+    private Sphere _sphere;
+    public Sphere Sphere
+    {
+        get { return _sphere; }
+        set
+        {
+            _sphere = value;
+            Sphere.Initialize(this);
+
+            // Right
+            EventTrigger trigger = RightButton.gameObject.GetComponent<EventTrigger>();
+            EventTrigger.Entry entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerDown;
+            entry.callback.AddListener((eventData) => { Sphere.MoveDirection(Move.Right); });
+
+            trigger.triggers.Clear();
+            trigger.triggers.Add(entry);
+
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => { Sphere.StopDirection(Move.Right); });
+
+            trigger.triggers.Add(entry);
+
+            // Down
+            trigger = DownButton.gameObject.GetComponent<EventTrigger>();
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerDown;
+            entry.callback.AddListener((eventData) => { Sphere.MoveDirection(Move.Down); });
+
+            trigger.triggers.Clear();
+            trigger.triggers.Add(entry);
+
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => { Sphere.StopDirection(Move.Down); });
+
+            trigger.triggers.Add(entry);
+
+            // Left
+            trigger = LeftButton.gameObject.GetComponent<EventTrigger>();
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerDown;
+            entry.callback.AddListener((eventData) => { Sphere.MoveDirection(Move.Left); });
+
+            trigger.triggers.Clear();
+            trigger.triggers.Add(entry);
+
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => { Sphere.StopDirection(Move.Left); });
+
+            trigger.triggers.Add(entry);
+
+            // Up
+            trigger = UpButton.gameObject.GetComponent<EventTrigger>();
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerDown;
+            entry.callback.AddListener((eventData) => { Sphere.MoveDirection(Move.Up); });
+
+            trigger.triggers.Clear();
+            trigger.triggers.Add(entry);
+
+            entry = new EventTrigger.Entry();
+            entry.eventID = EventTriggerType.PointerUp;
+            entry.callback.AddListener((eventData) => { Sphere.StopDirection(Move.Up); });
+
+            trigger.triggers.Add(entry);
+        }
+    }
+
     public GameObject GameViewPanel;
-    public GameObject Game;
+    public MapGenerator Game;
+
+    public Button RightButton;
+    public Button LeftButton;
+    public Button DownButton;
+    public Button UpButton;
 
     private float _width;
     private float _height;
@@ -65,19 +144,28 @@ public class Main : MonoBehaviour
     void Start()
     {
         DataService = new DataService("Database.db");
+        
+        // Attempt to get user
+        var user = DataService.GetUser();
 
-        // Create
-        //DataService.CreateDB();
-
+        if (user != null)
+            Login(user);
+        else
+        {
+            StartPanel.SetActive(true);
+            TopBar.SetActive(false);
+            MainMenuPanel.SetActive(false);
+        }
+        
         // panels
-        StartPanel.SetActive(true);
-        TopBar.SetActive(false);
-        MainMenuPanel.SetActive(false);
+
         SettingsPanel.SetActive(false);
         MapsPanel.SetActive(false);
 
         GameViewPanel.SetActive(false);
-        Game.SetActive(false);
+
+        Game.Initialize(this, DataService);
+        Game.gameObject.SetActive(false);
 
         // Resolutions.
 
@@ -92,29 +180,22 @@ public class Main : MonoBehaviour
         _cameraTransform = transform;
 
         SetupGameUi();
-
-        Sphere.Initialize(this);
     }
 
     public void ButtonClicked(int button)
     {
         ButtonClick buttonClick = (ButtonClick)button;
 
+        //--
+        StartLoading(true);
+
         switch (buttonClick)
         {
             case ButtonClick.NextButton:
+
                 if (string.IsNullOrEmpty(UserInputField.text.TrimEnd()))
                     return;
-
-                DataService.CreateUser(UserInputField.text);
-
-                StartPanel.SetActive(false);
-
-                var user = DataService.GetUser();
-                ProfileName.text = user.Name;
-                ControllerType = (ControllerType)user.ControllerType;
-
-                ShowMainMenu();
+                Login(null, UserInputField.text);
                 break;
 
             case ButtonClick.SettingsButton:
@@ -131,7 +212,7 @@ public class Main : MonoBehaviour
                 var i = 0;
                 var xPos = -285f;
                 var yPos = 100f;
-
+                
                 IEnumerable<Map> maps = DataService.GetMaps();
                 foreach (var map in maps)
                 {
@@ -146,12 +227,11 @@ public class Main : MonoBehaviour
 
                     xPos = xPos + 85f;
                 }
-
+                
                 MapsPanel.SetActive(true);
                 break;
 
-            case ButtonClick.Map:
-                MapsPanel.SetActive(false);
+            case ButtonClick.ReloadButton:
 
                 InitGame();
                 break;
@@ -171,7 +251,7 @@ public class Main : MonoBehaviour
             case ButtonClick.GameSettingsButton:
 
                 GameViewPanel.SetActive(false);
-                Game.SetActive(false);
+                Game.gameObject.SetActive(false);
 
                 // for now
                 ShowMainMenu();
@@ -181,6 +261,25 @@ public class Main : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+
+        //--
+        StartLoading(false);
+    }
+
+    private void Login(User loggedUser, string name = null)
+    {
+        StartPanel.SetActive(false);
+
+        if (loggedUser == null)
+        {
+            DataService.CreateUser(name);
+            loggedUser = DataService.GetUser();
+        }
+
+        ProfileName.text = loggedUser.Name;
+        ControllerType = (ControllerType)loggedUser.ControllerType;
+
+        ShowMainMenu();
     }
 
     private void CreateMapButton(float x, float y, int mapId)
@@ -206,28 +305,40 @@ public class Main : MonoBehaviour
     {
         return () =>
         {
-            IEnumerable<MapTile> tiles = DataService.GetTiles(mapId);
-            foreach (var tile in tiles)
-            {
-                Debug.Log(tile.PrintObject(tile.TyleType));
-            }
+            InitGame(mapId);
         };
     }
 
-    public void ShowMainMenu()
+    public void InitGame(int mapId = 0)
     {
-        MainMenuPanel.SetActive(true);
-        TopBar.SetActive(true);
-    }
+        //--
+        StartLoading(true);
 
-    private void InitGame()
-    {
+        if (mapId == 0)
+            mapId = CurrentMapId;
+
+        MapsPanel.SetActive(false);
+
+        Game.CreateMap(mapId);
+
         TopBar.SetActive(false);
 
         SetupGameControlls();
         GameViewPanel.SetActive(true);
 
-        Game.SetActive(true);
+        Game.gameObject.SetActive(true);
+
+        //--
+        StartLoading(false);
+    }
+    
+    public void ShowMainMenu()
+    {
+        if (Game.CurrentGame)
+            Game.CurrentGame.gameObject.SetActive(false);
+
+        MainMenuPanel.SetActive(true);
+        TopBar.SetActive(true);
     }
 
     public void ShowDebugLog()
@@ -239,8 +350,9 @@ public class Main : MonoBehaviour
     public void SelectControllerType(int controllerType)
     {
         ControllerType = (ControllerType)controllerType;
+        
         DataService.UpdateUserControllerType(controllerType);
-
+        
         ButtonClicked((int)ButtonClick.SettingsBackButton);
     }
 
@@ -248,6 +360,8 @@ public class Main : MonoBehaviour
     {
         Image image;
         Text text;
+
+        LoadingImage.rectTransform.sizeDelta = new Vector2(_width, _height);
 
         Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
@@ -274,6 +388,11 @@ public class Main : MonoBehaviour
                 case "GameSettingsButton":
                     image = child.gameObject.GetComponent<Image>();
                     image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 6), _bottomPoint - (-Logic.GetPercent(_height, 90)), 0f);
+                    break;
+
+                case "ReloadButton":
+                    image = child.gameObject.GetComponent<Image>();
+                    image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 6), _bottomPoint - (-Logic.GetPercent(_height, 70)), 0f);
                     break;
 
                 case "RightController":
@@ -493,5 +612,15 @@ public class Main : MonoBehaviour
                     break;
             }
         }
+    }
+    
+    public void StartLoading(bool value)
+    {
+        if (LoadingImage.gameObject.activeSelf == value) return;
+
+        Debug.Log(" - " + LoadingImage.gameObject.activeSelf);
+        
+        LoadingImage.gameObject.SetActive(value);
+        Debug.Log(LoadingImage.gameObject.activeSelf);
     }
 }

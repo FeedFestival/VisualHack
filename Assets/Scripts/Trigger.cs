@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Assets.Scripts.Types;
 
 public class Trigger : MonoBehaviour
@@ -19,25 +20,30 @@ public class Trigger : MonoBehaviour
                 Bridge.BridgeState = ObjectState.Deactivated;
         }
     }
-
+    
     public Bridge Bridge;
 
-    // Use this for initialization
-    void Start()
+    public void Initialize(Bridge bridge)   // from DB
     {
-
+        Bridge = bridge;
     }
 
     void OnTriggerEnter(Collider objC)
     {
         if (TriggerState != ObjectState.Activated)
             if (objC.tag.Contains("Box"))
+            {
                 TriggerState = ObjectState.Activated;
+                //objC.transform.parent.GetComponent<Box>().OnTopOfTrigger = true;
+            }
     }
     void OnTriggerExit(Collider objC)
     {
         if (TriggerState == ObjectState.Activated)
             if (objC.tag.Contains("Box"))
+            {
                 TriggerState = ObjectState.Deactivated;
+                //objC.transform.parent.GetComponent<Box>().OnTopOfTrigger = false;
+            }
     }
 }

@@ -4,7 +4,7 @@ using Assets.Scripts.Types;
 
 public class Sphere : MonoBehaviour
 {
-    private Main _main;
+    public Main Main;
 
     [HideInInspector]
     public Controller Controller;
@@ -33,14 +33,14 @@ public class Sphere : MonoBehaviour
 
     public void Initialize(Main main)
     {
-        _main = main;
+        Main = main;
         Controller = GetComponent<Controller>();
         Controller.Initialize(this);
     }
 
-    public void MoveDirection(int moveIndex)
+    public void MoveDirection(Move moveIndex)
     {
-        GoDirection = (Move)moveIndex;
+        GoDirection = moveIndex;
         switch (GoDirection)
         {
             case Move.Up:
@@ -65,11 +65,11 @@ public class Sphere : MonoBehaviour
         }
     }
 
-    public void StopDirection(int moveIndex)
+    public void StopDirection(Move moveIndex)
     {
-        if (GoDirection == (Move)moveIndex)
+        if (GoDirection == moveIndex)
             GoDirection = Move.None;
-        switch ((Move)moveIndex)
+        switch (moveIndex)
         {
             case Move.Up:
 
@@ -96,23 +96,23 @@ public class Sphere : MonoBehaviour
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.D))
-            MoveDirection(1);
+            MoveDirection(Move.Right);
         if (Input.GetKeyUp(KeyCode.D))
-            StopDirection(1);
+            StopDirection(Move.Right);
 
         if (Input.GetKeyDown(KeyCode.A))
-            MoveDirection(3);
+            MoveDirection(Move.Left);
         if (Input.GetKeyUp(KeyCode.A))
-            StopDirection(3);
+            StopDirection(Move.Left);
 
         if (Input.GetKeyDown(KeyCode.W))
-            MoveDirection(0);
+            MoveDirection(Move.Up);
         if (Input.GetKeyUp(KeyCode.W))
-            StopDirection(0);
+            StopDirection(Move.Up);
 
         if (Input.GetKeyDown(KeyCode.S))
-            MoveDirection(2);
+            MoveDirection(Move.Down);
         if (Input.GetKeyUp(KeyCode.S))
-            StopDirection(2);
+            StopDirection(Move.Down);
     }
 }

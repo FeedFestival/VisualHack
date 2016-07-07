@@ -23,7 +23,7 @@ public class BoxCollider : MonoBehaviour
             
             _box.PlayerIsIn = ColliderPosition;
         }
-
+        
         switch (ColliderPosition)
         {
             case Direction.Up:

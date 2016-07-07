@@ -26,7 +26,7 @@ namespace Assets.Scripts.Types
 
     public enum ButtonClick
     {
-        NextButton, SettingsButton, RedBallButton, Map, SettingsBackButton, MapsBackButton, GameSettingsButton
+        NextButton, SettingsButton, RedBallButton, Map, SettingsBackButton, MapsBackButton, GameSettingsButton, ReloadButton
     }
 
     public enum ControllerType
