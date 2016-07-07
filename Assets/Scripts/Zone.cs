@@ -17,7 +17,7 @@ public class Zone : MonoBehaviour
     {
         switch (ZoneType)
         {
-            case ZoneType.Pit:
+            case ZoneType.DeathZone:
 
                 if (objC.CompareTag("Sphere"))
                 {

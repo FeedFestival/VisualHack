@@ -21,7 +21,7 @@ namespace Assets.Scripts.Types
 
     public enum Obstacle
     {
-        Player, Box, Solid, Nothing
+        Sphere, Box, Solid, Nothing
     }
 
     public enum ButtonClick
@@ -62,7 +62,22 @@ namespace Assets.Scripts.Types
 
     public enum ZoneType
     {
-        Pit, Solid, Walkable
+        DeathZone, Solid, Walkable
+    }
+    
+    public enum TileType
+    {
+        Empty, Misc, DeathZone, PuzzleObject
+    }
+
+    public enum Misc
+    {
+        None, PipeConnector, Tutorial1, PitHorizontal2, PipeHorizontal
+    }
+
+    public enum PuzzleObject
+    {
+        Player, Box, Bridge, Trigger
     }
 
     public static class Logic

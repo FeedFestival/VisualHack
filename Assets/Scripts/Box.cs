@@ -14,22 +14,22 @@ public class Box : MonoBehaviour
         {
             if (value == null)
             {
-                if (UpperObject == Obstacle.Player)
+                if (UpperObject == Obstacle.Sphere)
                 {
                     UpperObject = Obstacle.Nothing;
                     Sphere.DownBox = null;
                 }
-                if (RightObject == Obstacle.Player)
+                if (RightObject == Obstacle.Sphere)
                 {
                     RightObject = Obstacle.Nothing;
                     Sphere.LeftBox = null;
                 }
-                if (DownObject == Obstacle.Player)
+                if (DownObject == Obstacle.Sphere)
                 {
                     DownObject = Obstacle.Nothing;
                     Sphere.UpBox = null;
                 }
-                if (LeftObject == Obstacle.Player)
+                if (LeftObject == Obstacle.Sphere)
                 {
                     LeftObject = Obstacle.Nothing;
                     Sphere.RightBox = null;
@@ -52,25 +52,25 @@ public class Box : MonoBehaviour
             {
                 case Direction.Up:
 
-                    UpperObject = Obstacle.Player;
+                    UpperObject = Obstacle.Sphere;
                     Sphere.DownBox = this;
                     break;
 
                 case Direction.Right:
 
-                    RightObject = Obstacle.Player;
+                    RightObject = Obstacle.Sphere;
                     Sphere.LeftBox = this;
                     break;
 
                 case Direction.Down:
 
-                    DownObject = Obstacle.Player;
+                    DownObject = Obstacle.Sphere;
                     Sphere.UpBox = this;
                     break;
 
                 case Direction.Left:
 
-                    LeftObject = Obstacle.Player;
+                    LeftObject = Obstacle.Sphere;
                     Sphere.RightBox = this;
                     break;
 
@@ -195,25 +195,25 @@ public class Box : MonoBehaviour
         {
             case Direction.Up:
 
-                if (DownObject == Obstacle.Player && UpperObject == Obstacle.Nothing)
+                if (DownObject == Obstacle.Sphere && UpperObject == Obstacle.Nothing)
                     return true;
                 break;
 
             case Direction.Right:
 
-                if (LeftObject == Obstacle.Player && RightObject == Obstacle.Nothing)
+                if (LeftObject == Obstacle.Sphere && RightObject == Obstacle.Nothing)
                     return true;
                 break;
 
             case Direction.Down:
 
-                if (UpperObject == Obstacle.Player && DownObject == Obstacle.Nothing)
+                if (UpperObject == Obstacle.Sphere && DownObject == Obstacle.Nothing)
                     return true;
                 break;
 
             case Direction.Left:
 
-                if (RightObject == Obstacle.Player && LeftObject == Obstacle.Nothing)
+                if (RightObject == Obstacle.Sphere && LeftObject == Obstacle.Nothing)
                     return true;
                 break;
 

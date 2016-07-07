@@ -19,7 +19,7 @@ public class Bridge : MonoBehaviour
 
             foreach (var zone in Zones)
             {
-                zone.ZoneType = BridgeState == ObjectState.Activated ? ZoneType.Walkable : ZoneType.Pit;
+                zone.ZoneType = BridgeState == ObjectState.Activated ? ZoneType.Walkable : ZoneType.DeathZone;
             }
 
             _startScaleMarker = _bridgeRoadTransform.localScale;
@@ -57,24 +57,19 @@ public class Bridge : MonoBehaviour
         Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
         foreach (Transform objT in allChildren)
         {
-            switch (objT.gameObject.name)
+            if (objT.gameObject.name == "BridgeRoadSprite")
             {
-                case "BridgeRoadSprite":
-                    _bridgeRoadTransform = objT;
+                _bridgeRoadTransform = objT;
 
-                    _bridgeRoadTransform.localScale = BridgeState == ObjectState.Activated ? _maxScaleMarker : _minScaleMarker;
-                    _bridgeRoadTransform.localPosition = BridgeState == ObjectState.Activated ? _maxMoveMarker : _minMoveMarker;
+                _bridgeRoadTransform.localScale = BridgeState == ObjectState.Activated ? _maxScaleMarker : _minScaleMarker;
+                _bridgeRoadTransform.localPosition = BridgeState == ObjectState.Activated ? _maxMoveMarker : _minMoveMarker;
+            }
+            else if (objT.gameObject.name.Contains("Zone"))
+            {
+                var zone = objT.GetComponent<Zone>();
+                zone.ZoneType = BridgeState == ObjectState.Activated ? ZoneType.Walkable : ZoneType.DeathZone;
 
-                    break;
-
-                case "Zone":
-
-                    var zone = objT.GetComponent<Zone>();
-                    zone.ZoneType = BridgeState == ObjectState.Activated ? ZoneType.Walkable : ZoneType.Pit;
-
-                    Zones.Add(zone);
-
-                    break;
+                Zones.Add(zone);
             }
         }
     }

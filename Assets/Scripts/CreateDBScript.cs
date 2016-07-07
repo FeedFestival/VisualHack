@@ -16,18 +16,18 @@ public class CreateDBScript : MonoBehaviour {
         var ds = new DataService("tempDatabase.db");
         ds.CreateDB();
         
-        var people = ds.GetPersons ();
-        ToConsole (people);
-        people = ds.GetPersonsNamedRoberto ();
-        ToConsole("Searching for Roberto ...");
-        ToConsole (people); 
+        //var people = ds.GetPersons ();
+        //ToConsole (people);
+        //people = ds.GetPersonsNamedRoberto ();
+        //ToConsole("Searching for Roberto ...");
+        //ToConsole (people); 
     }
 	
-	private void ToConsole(IEnumerable<Person> people){
-		foreach (var person in people) {
-			ToConsole(person.ToString());
-		}
-	}
+	//private void ToConsole(IEnumerable<Person> people){
+	//	foreach (var person in people) {
+	//		ToConsole(person.ToString());
+	//	}
+	//}
 	
 	private void ToConsole(string msg){
 		DebugText.text += System.Environment.NewLine + msg;

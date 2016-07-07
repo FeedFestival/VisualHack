@@ -1,7 +1,10 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 using Assets.Scripts.Types;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
@@ -62,7 +65,9 @@ public class Main : MonoBehaviour
     void Start()
     {
         DataService = new DataService("Database.db");
-        DataService.CreateDB();
+
+        // Create
+        //DataService.CreateDB();
 
         // panels
         StartPanel.SetActive(true);
@@ -120,7 +125,27 @@ public class Main : MonoBehaviour
                 break;
 
             case ButtonClick.RedBallButton:
+
                 MainMenuPanel.SetActive(false);
+
+                var i = 0;
+                var xPos = -285f;
+                var yPos = 100f;
+
+                IEnumerable<Map> maps = DataService.GetMaps();
+                foreach (var map in maps)
+                {
+                    i++;
+                    if (i > 7)
+                    {
+                        xPos = -285f;
+                        yPos = yPos - 80f;
+                    }
+
+                    CreateMapButton(xPos, yPos, map.Id);
+
+                    xPos = xPos + 85f;
+                }
 
                 MapsPanel.SetActive(true);
                 break;
@@ -156,6 +181,37 @@ public class Main : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void CreateMapButton(float x, float y, int mapId)
+    {
+        var go = Instantiate(Resources.Load("Prefabs/UI/Map")) as GameObject;
+
+        var rectTransform = go.GetComponent<RectTransform>();
+        rectTransform.SetParent(MapsPanel.transform);
+        rectTransform.offsetMin = Vector2.zero;
+        rectTransform.offsetMax = Vector2.zero;
+
+        rectTransform.sizeDelta = new Vector2(50, 50);
+
+        rectTransform.localScale = new Vector3(1, 1, 1);
+        rectTransform.localPosition = new Vector3(x, y, 0);
+
+        var but = go.GetComponent<Button>();
+        but.onClick = new Button.ButtonClickedEvent();
+        but.onClick.AddListener(OpenMap(mapId));
+    }
+
+    private UnityAction OpenMap(int mapId)
+    {
+        return () =>
+        {
+            IEnumerable<MapTile> tiles = DataService.GetTiles(mapId);
+            foreach (var tile in tiles)
+            {
+                Debug.Log(tile.PrintObject(tile.TyleType));
+            }
+        };
     }
 
     public void ShowMainMenu()
@@ -223,7 +279,7 @@ public class Main : MonoBehaviour
                 case "RightController":
                     image = child.gameObject.GetComponent<Image>();
                     image.rectTransform.sizeDelta = new Vector2(Logic.GetPercent(_width, 10.30444f), Logic.GetPercent(_height, 18.33333f));
-                    
+
                     break;
                 case "LeftController":
                     image = child.gameObject.GetComponent<Image>();
@@ -248,31 +304,30 @@ public class Main : MonoBehaviour
     {
         Image image;
 
-        if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
-            ControllerType == ControllerType.Zas)
+        var xPos = 0f;
+        var yPos = 4.07f;
+        var orthographicSize = 4.77f;
+
+        if (_width == 854)
         {
-            if (_width == 854)
+            yPos = 4.07f;
+            if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+                ControllerType == ControllerType.Zas)
             {
-                _cameraTransform.position = new Vector3(0.09f, -0.07f, 0);
-                GetComponent<Camera>().orthographicSize = 4.7f;
+                xPos = 5.59f;
+            }
+            else if (ControllerType == ControllerType.Classic)
+            {
+                xPos = 7.6f;
+            }
+            else
+            {
+                xPos = 7f;
             }
         }
-        else if (ControllerType == ControllerType.Classic)
-        {
-            if (_width == 854)
-            {
-                _cameraTransform.position = new Vector3(2.25f, -0.07f, 0);
-                GetComponent<Camera>().orthographicSize = 4.77f;
-            }
-        }
-        else
-        {
-            if (_width == 854)
-            {
-                _cameraTransform.position = new Vector3(1.4f, -0.07f, 0);
-                GetComponent<Camera>().orthographicSize = 4.77f;
-            }
-        }
+
+        GetComponent<Camera>().orthographicSize = orthographicSize;
+        _cameraTransform.position = new Vector3(xPos, yPos, 0);
 
         Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
