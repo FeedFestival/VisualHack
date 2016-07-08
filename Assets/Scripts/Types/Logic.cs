@@ -33,7 +33,12 @@ namespace Assets.Scripts.Types
     {
         DefaultPacked, Default, Zas, ClassicPacked, Classic
     }
-    
+
+    public enum LoadThenExecute
+    {
+        Button, MapLoad
+    }
+
     public enum Tag
     {
         [Description("SolidUp")]
@@ -64,7 +69,7 @@ namespace Assets.Scripts.Types
     {
         DeathZone, Solid, Walkable
     }
-    
+
     public enum TileType
     {
         Empty, Misc, DeathZone, PuzzleObject

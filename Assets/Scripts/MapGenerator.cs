@@ -223,7 +223,7 @@ public class MapGenerator : MonoBehaviour
         _main.CurrentMapId = mapId;
         _bridges = new List<Bridge>();
 
-        Destroy(CurrentGame);
+        //Destroy(CurrentGame);
 
         CurrentGame = Instantiate(Resources.Load("Prefabs/InitGameObj"), new Vector3(),
             Quaternion.identity) as GameObject;
@@ -243,7 +243,7 @@ public class MapGenerator : MonoBehaviour
 
         foreach (var tile in tiles)
         {
-            Debug.Log(tile.PrintObject(tile.TyleType));
+            //Debug.Log(tile.PrintObject(tile.TyleType));
 
             switch (tile.TyleType)
             {

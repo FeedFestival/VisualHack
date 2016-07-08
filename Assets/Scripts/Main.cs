@@ -29,7 +29,7 @@ public class Main : MonoBehaviour
         }
     }
 
-    public Image LoadingImage;
+    public GameObject LoadingImage;
 
     [Header("Start")]
     public GameObject StartPanel;
@@ -144,7 +144,7 @@ public class Main : MonoBehaviour
     void Start()
     {
         DataService = new DataService("Database.db");
-        
+
         // Attempt to get user
         var user = DataService.GetUser();
 
@@ -156,7 +156,7 @@ public class Main : MonoBehaviour
             TopBar.SetActive(false);
             MainMenuPanel.SetActive(false);
         }
-        
+
         // panels
 
         SettingsPanel.SetActive(false);
@@ -182,14 +182,26 @@ public class Main : MonoBehaviour
         SetupGameUi();
     }
 
+    public ButtonClick ButtonClick;
+
     public void ButtonClicked(int button)
     {
-        ButtonClick buttonClick = (ButtonClick)button;
+        ButtonClick = (ButtonClick)button;
 
-        //--
-        StartLoading(true);
+        // for realoadButton we need custom logic so that the loader behaves corectly.
+        if (ButtonClick == ButtonClick.ReloadButton)
+        {
+            InitGame();
+            return;
+        }
 
-        switch (buttonClick)
+        //-- StartLoading(true);
+        StartCoroutine(LoaderWaitThenExecute(LoadThenExecute.Button));
+    }
+
+    private void ExecuteButtonAction()
+    {
+        switch (ButtonClick)
         {
             case ButtonClick.NextButton:
 
@@ -212,7 +224,7 @@ public class Main : MonoBehaviour
                 var i = 0;
                 var xPos = -285f;
                 var yPos = 100f;
-                
+
                 IEnumerable<Map> maps = DataService.GetMaps();
                 foreach (var map in maps)
                 {
@@ -227,13 +239,8 @@ public class Main : MonoBehaviour
 
                     xPos = xPos + 85f;
                 }
-                
+
                 MapsPanel.SetActive(true);
-                break;
-
-            case ButtonClick.ReloadButton:
-
-                InitGame();
                 break;
 
             case ButtonClick.SettingsBackButton:
@@ -261,9 +268,8 @@ public class Main : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
-
-        //--
-        StartLoading(false);
+        //-- StartLoading(false);
+        StartCoroutine(FinishLoaderWait());
     }
 
     private void Login(User loggedUser, string name = null)
@@ -311,15 +317,22 @@ public class Main : MonoBehaviour
 
     public void InitGame(int mapId = 0)
     {
-        //--
-        StartLoading(true);
+        if (mapId != 0)
+            CurrentMapId = mapId;
 
-        if (mapId == 0)
-            mapId = CurrentMapId;
+        if (Game.CurrentGame != null)
+            Destroy(Game.CurrentGame);
+
+        //-- StartLoading(true);
+        StartCoroutine(LoaderWaitThenExecute(LoadThenExecute.MapLoad));
+    }
+
+    private void ExecuteInitGame()
+    {
 
         MapsPanel.SetActive(false);
 
-        Game.CreateMap(mapId);
+        Game.CreateMap(CurrentMapId);
 
         TopBar.SetActive(false);
 
@@ -328,10 +341,10 @@ public class Main : MonoBehaviour
 
         Game.gameObject.SetActive(true);
 
-        //--
-        StartLoading(false);
+        //-- StartLoading(false);
+        StartCoroutine(FinishLoaderWait());
     }
-    
+
     public void ShowMainMenu()
     {
         if (Game.CurrentGame)
@@ -350,9 +363,9 @@ public class Main : MonoBehaviour
     public void SelectControllerType(int controllerType)
     {
         ControllerType = (ControllerType)controllerType;
-        
+
         DataService.UpdateUserControllerType(controllerType);
-        
+
         ButtonClicked((int)ButtonClick.SettingsBackButton);
     }
 
@@ -361,7 +374,10 @@ public class Main : MonoBehaviour
         Image image;
         Text text;
 
-        LoadingImage.rectTransform.sizeDelta = new Vector2(_width, _height);
+        LoadingImage.transform.parent.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(_width, _height);
+
+        //-- StartLoading(false);
+        StartCoroutine(FinishLoaderWait());
 
         Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
@@ -613,14 +629,30 @@ public class Main : MonoBehaviour
             }
         }
     }
-    
-    public void StartLoading(bool value)
-    {
-        if (LoadingImage.gameObject.activeSelf == value) return;
 
-        Debug.Log(" - " + LoadingImage.gameObject.activeSelf);
-        
-        LoadingImage.gameObject.SetActive(value);
-        Debug.Log(LoadingImage.gameObject.activeSelf);
+    private IEnumerator LoaderWaitThenExecute(LoadThenExecute execiteAfter)
+    {
+        if (LoadingImage.transform.parent.gameObject.activeSelf == false)
+            LoadingImage.transform.parent.gameObject.SetActive(true);
+
+        yield return new WaitForSeconds(0.2f);
+
+        if (execiteAfter == LoadThenExecute.Button)
+            ExecuteButtonAction();
+        else
+            ExecuteInitGame();
+    }
+
+    private IEnumerator FinishLoaderWait()
+    {
+        yield return new WaitForSeconds(0.1f);
+
+        LoadingImage.transform.parent.gameObject.SetActive(false);
+    }
+    
+    void Update()
+    {
+        if (LoadingImage.transform.parent.gameObject.activeSelf)
+            LoadingImage.transform.Rotate(new Vector3(0, 0, 100) * Time.deltaTime, Space.World);
     }
 }
