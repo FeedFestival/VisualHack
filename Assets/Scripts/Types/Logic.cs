@@ -98,6 +98,9 @@ namespace Assets.Scripts.Types
         public static readonly float LerpRatio = 0.02f;
         public static readonly float LerpSpeed = 3f;
 
+        public static readonly Color32 Transparent = new Color32(0, 0, 0, 0);
+        public static readonly Color32 Black = new Color32(0, 0, 0, 255);
+
         public static float GetPercent(float value, float percent)
         {
             return (value / 100f) * percent;

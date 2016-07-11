@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Types;
@@ -33,6 +32,7 @@ public class MapGenerator : MonoBehaviour
 
     // Inspector - END
 
+    public int ExecuteMapId;
     public Map CurrentMap;
 
     private Transform _mapMiscT;
@@ -239,7 +239,7 @@ public class MapGenerator : MonoBehaviour
         else if (CurrentMap != null) CurrentMap.GameObject = go;
     }
 
-    public void CreateMap(int mapId, bool inEditor = false)
+    public void CreateMap(bool inEditor = false)
     {
         IEnumerable<MapTile> tiles;
 
@@ -251,11 +251,9 @@ public class MapGenerator : MonoBehaviour
             _main = Camera.main.gameObject.GetComponent<Main>();
         }
 
-        CurrentMap = _dataService.GetMap(mapId);
-        tiles = _dataService.GetTiles(mapId);
-
-        _main.CurrentMapId = CurrentMap.Id;
-
+        CurrentMap = _dataService.GetMap(ExecuteMapId);
+        tiles = _dataService.GetTiles(ExecuteMapId);
+        
         GenerateBaseMap();
 
         if (tiles == null || !tiles.Any()) return;

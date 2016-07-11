@@ -129,8 +129,10 @@ public class MapGeneratorEditor : Editor
                 EditorGUILayout.BeginVertical();
 
                 if (GUILayout.Button("Generate Map", GUILayout.Width(Logic.GetPercent(Screen.width, 25))))
-                    _myScript.CreateMap(map.Id, true);
-
+                {
+                    _myScript.ExecuteMapId = map.Id;
+                    _myScript.CreateMap(true);
+                }
                 if (_myScript.CurrentMap != null && _myScript.CurrentMap.Id == map.Id)
                     if (GUILayout.Button("Update ?", GUILayout.Width(Logic.GetPercent(Screen.width, 25))))
                         _myScript.MapId = map.Id;

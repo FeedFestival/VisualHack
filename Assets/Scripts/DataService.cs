@@ -91,13 +91,8 @@ public class DataService
      * * --------------------------------------------------------------------------------------------------------------------------------------
      */
 
-    public void CreateUser(string name)
+    public void CreateUser(User user)
     {
-        var user = new User
-        {
-            Name = name,
-            ControllerType = (int)ControllerType.Default
-        };
         _connection.Insert(user);
     }
 
