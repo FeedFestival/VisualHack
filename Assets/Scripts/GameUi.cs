@@ -60,6 +60,14 @@ public class GameUi : MonoBehaviour
                     _main.LoadingController.LoadingIcon = child.gameObject;
                     break;
 
+                case "LoadingIconText":
+                    _main.LoadingController.LoadingIconText = child.gameObject.GetComponent<Text>();
+                    break;
+
+                case "LoadingIconCircle":
+                    _main.LoadingController.LoadingIconCircle = child.gameObject.GetComponent<Text>();
+                    break;
+
                 case "DebugContainer":
                     _debugContainer = child.gameObject;
                     break;

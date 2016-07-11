@@ -33,6 +33,24 @@ public class Sphere : MonoBehaviour
 
     private SpriteRenderer _sprite;
 
+    public bool Win;
+
+    private bool _fallInPit;
+    public bool FallInPit
+    {
+        get { return _fallInPit; }
+        set
+        {
+            _fallInPit = value;
+            if (!_fallInPit) return;
+
+            UserPressedRight = false;
+            UserPressedDown = false;
+            UserPressedLeft = false;
+            UserPressedUp = false;
+        }
+    }
+
     public void Initialize(Main main)
     {
         Main = main;
@@ -54,6 +72,8 @@ public class Sphere : MonoBehaviour
 
     public void MoveDirection(Move moveIndex)
     {
+        if (FallInPit) return;
+
         GoDirection = moveIndex;
         switch (GoDirection)
         {
@@ -132,10 +152,7 @@ public class Sphere : MonoBehaviour
         if (FallInPit)
             FallInPitAnim();
     }
-
-    public bool Win;
-    public bool FallInPit;
-
+    
     private float _scaleLerpTime;
 
     private void FallInPitAnim(bool outside = false)
@@ -148,11 +165,10 @@ public class Sphere : MonoBehaviour
         if (!(_scaleLerpTime >= 1)) return;
 
         _scaleLerpTime = 0;
+        
+        Main.InitGame(Win ? Main.GetNextMapId() : 0);
 
-        if (Win)
-            Main.InitGame(Main.GetNextMapId());
-        else
-            Main.InitGame();
+        FallInPit = false;
     }
 
     public void YouDeadBro()

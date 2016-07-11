@@ -9,11 +9,11 @@ public class Main : MonoBehaviour
     public DataService DataService;
     [HideInInspector]
     public GameProperties GameProperties;
-
+    [HideInInspector]
     public LoadingController LoadingController;
 
     private GameUi _gameUi;
-    
+
     private MapGenerator _mapGenerator;
 
     private ButtonClick _buttonClick;
@@ -76,7 +76,7 @@ public class Main : MonoBehaviour
         // for realoadButton we need custom logic so that the loader behaves corectly.
         if (_buttonClick == ButtonClick.ReloadButton)
         {
-            InitGame();
+            InitGame(0, true);
             return;
         }
 
@@ -165,15 +165,13 @@ public class Main : MonoBehaviour
         ShowMainMenu();
     }
 
-    public void InitGame(int mapId = 0)
+    public void InitGame(int mapId, bool reload = false)
     {
-        if (mapId != 0) // If no mapId then reload the current map.
-            _mapGenerator.ExecuteMapId = mapId;
+        _mapGenerator.SetupCurrentMap(mapId);
 
-        if (_mapGenerator.CurrentMap != null && _mapGenerator.CurrentMap.GameObject != null)
-            Destroy(_mapGenerator.CurrentMap.GameObject);
-
-        StartCoroutine(LoadingController.LoaderWaitThenExecute(LoadThenExecute.MapLoad));
+        StartCoroutine(reload
+            ? LoadingController.LoaderWaitThenExecute(LoadThenExecute.MapLoad)
+            : LoadingController.LoadMapWithText(_mapGenerator.CurrentMap.Name));
     }
 
     public void ExecuteInitGame()

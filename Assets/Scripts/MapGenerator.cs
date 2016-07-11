@@ -31,8 +31,7 @@ public class MapGenerator : MonoBehaviour
     }
 
     // Inspector - END
-
-    public int ExecuteMapId;
+    
     public Map CurrentMap;
 
     private Transform _mapMiscT;
@@ -239,10 +238,16 @@ public class MapGenerator : MonoBehaviour
         else if (CurrentMap != null) CurrentMap.GameObject = go;
     }
 
+    public void SetupCurrentMap(int id)
+    {
+        if (id != 0) // If no mapId then reload the current map.
+            CurrentMap = _dataService.GetMap(id);
+    }
+
     public void CreateMap(bool inEditor = false)
     {
         IEnumerable<MapTile> tiles;
-
+        
         if (inEditor)
         {
             MapId = 0;
@@ -251,8 +256,9 @@ public class MapGenerator : MonoBehaviour
             _main = Camera.main.gameObject.GetComponent<Main>();
         }
 
-        CurrentMap = _dataService.GetMap(ExecuteMapId);
-        tiles = _dataService.GetTiles(ExecuteMapId);
+        Destroy(CurrentMap.GameObject);
+
+        tiles = _dataService.GetTiles(CurrentMap.Id);
         
         GenerateBaseMap();
 

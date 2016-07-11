@@ -52,6 +52,9 @@ public class Controller : MonoBehaviour
 
     private bool CheckUserPress(Direction direction)
     {
+        if (_sphere.FallInPit)
+            return false;
+
         switch (direction)
         {
             case Direction.Up:

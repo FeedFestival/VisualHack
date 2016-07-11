@@ -100,6 +100,10 @@ namespace Assets.Scripts.Types
 
         public static readonly Color32 Transparent = new Color32(0, 0, 0, 0);
         public static readonly Color32 Black = new Color32(0, 0, 0, 255);
+        public static readonly Color32 White = new Color32(255, 255, 255, 255);
+        public static readonly Color32 WhiteTransparent = new Color32(255, 255, 255, 200);
+
+        public static readonly string circle = "";
 
         public static float GetPercent(float value, float percent)
         {
