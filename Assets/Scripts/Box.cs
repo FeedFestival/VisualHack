@@ -79,7 +79,20 @@ public class Box : MonoBehaviour
             }
         }
     }
-    
+
+    public bool IsBoxDead;
+
+    // children
+
+    private BoxCollider _boxColliderUp;
+    private BoxCollider _boxColliderRight;
+    private BoxCollider _boxColliderDown;
+    private BoxCollider _boxColliderLeft;
+
+    private SpriteRenderer _boxSprite;
+
+    private Transform _triggerCollider;
+
     public Obstacle UpperObject = Obstacle.Nothing;
     public Obstacle RightObject = Obstacle.Nothing;
     public Obstacle DownObject = Obstacle.Nothing;
@@ -88,7 +101,7 @@ public class Box : MonoBehaviour
     // moving variables
 
     private Transform _thisTransform;
-    
+
     private bool _pushRight;
     private bool _pushLeft;
     private bool _pushUp;
@@ -112,24 +125,36 @@ public class Box : MonoBehaviour
             {
                 case "BoxLeft":
 
-                    objT.gameObject.GetComponent<BoxCollider>().Initialize(this, Direction.Left);
+                    _boxColliderLeft = objT.gameObject.GetComponent<BoxCollider>();
+                    _boxColliderLeft.Initialize(this, Direction.Left);
                     break;
 
                 case "BoxRight":
 
-                    objT.gameObject.GetComponent<BoxCollider>().Initialize(this, Direction.Right);
+                    _boxColliderRight = objT.gameObject.GetComponent<BoxCollider>();
+                    _boxColliderRight.Initialize(this, Direction.Right);
                     break;
 
                 case "BoxUp":
 
-                    objT.gameObject.GetComponent<BoxCollider>().Initialize(this, Direction.Up);
+                    _boxColliderUp = objT.gameObject.GetComponent<BoxCollider>();
+                    _boxColliderUp.Initialize(this, Direction.Up);
                     break;
 
                 case "BoxDown":
 
-                    objT.gameObject.GetComponent<BoxCollider>().Initialize(this, Direction.Down);
+                    _boxColliderDown = objT.gameObject.GetComponent<BoxCollider>();
+                    _boxColliderDown.Initialize(this, Direction.Down);
+                    break;
+
+                case "Sprite":
+
+                    _boxSprite = objT.gameObject.GetComponent<SpriteRenderer>();
                     break;
             }
+
+            if (string.Equals(objT.gameObject.name, "TriggerCollider"))
+                _triggerCollider = objT;
         }
         CalculateNewCoord();
     }
@@ -150,13 +175,16 @@ public class Box : MonoBehaviour
 
         if (!(_lerpTime >= 1)) return;
 
+        if (IsBoxDead)
+            YouDeadBro(true);
+
         _lerpTime = 0f;
         _thisTransform.position = endMarker;
         CalculateNewCoord();
         referenceBool = false;
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (Sphere == null) return;
 
@@ -187,6 +215,9 @@ public class Box : MonoBehaviour
 
         if (_pushLeft)
             MoveUpdate(_endMarkerLeft, ref _pushLeft);
+
+        if (IsBoxDead)
+            FallInPit();
     }
 
     private bool CheckBoxRestrictions(Direction desiredPushDirection)
@@ -221,5 +252,59 @@ public class Box : MonoBehaviour
                 throw new ArgumentOutOfRangeException("desiredPushDirection", desiredPushDirection, null);
         }
         return false;
+    }
+
+    public void YouDeadBro(bool forReal = false)
+    {
+        IsBoxDead = true;
+
+        if (forReal)
+        {
+            Destroy(_boxColliderUp.gameObject);
+            Destroy(_boxColliderRight.gameObject);
+            Destroy(_boxColliderDown.gameObject);
+            Destroy(_boxColliderLeft.gameObject);
+
+            Destroy(_triggerCollider.gameObject);
+
+            if (UpperObject == Obstacle.Sphere)
+            {
+                Sphere.DownBox = null;
+                Sphere.Controller.DownObject = Obstacle.Nothing;
+            }
+            else if (RightObject == Obstacle.Sphere)
+            {
+                Sphere.LeftBox = null;
+                Sphere.Controller.LeftObject = Obstacle.Nothing;
+            }
+            else if (DownObject == Obstacle.Sphere)
+            {
+                Sphere.UpBox = null;
+                Sphere.Controller.UpperObject = Obstacle.Nothing;
+            }
+            else if (LeftObject == Obstacle.Sphere)
+            {
+                Sphere.RightBox = null;
+                Sphere.Controller.RightObject = Obstacle.Nothing;
+            }
+            
+            _boxSprite.transform.localPosition = new Vector3(_boxSprite.transform.localPosition.x, _boxSprite.transform.localPosition.y, 8f);
+
+            Destroy(this);
+        }
+    }
+
+    private float _scaleLerpTime;
+
+    private void FallInPit()
+    {
+        _thisTransform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(0.85f, 0.85f, 1), _scaleLerpTime * 4);
+        _boxSprite.color = Color.Lerp(Color.white, new Color32(199, 199, 199, 255), _scaleLerpTime * 4);
+        
+        _scaleLerpTime = _scaleLerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+
+        if (!(_scaleLerpTime >= 1)) return;
+
+        _scaleLerpTime = 0;
     }
 }

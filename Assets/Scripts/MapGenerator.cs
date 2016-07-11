@@ -8,22 +8,49 @@ using Assets.Scripts.Types;
 [ExecuteInEditMode]
 public class MapGenerator : MonoBehaviour
 {
+    // Inspector
+
+    public GameObject NewGameObject;
+
     public int MapId;
 
     public string MapName;
     public int MapNumber;
 
+    public IEnumerable<Map> Maps
+    {
+        set { }
+        get
+        {
+            if (_dataService == null)
+                _dataService = new DataService("Database.db");
+
+            return from element in _dataService.GetMaps()
+                   orderby element.Number descending
+                   select element;
+        }
+    }
+
+    // Inspector - END
+
+    public Map CurrentMap;
+
+    private Transform _mapMiscT;
+    private Transform _pitMiscT;
+    private Transform _hillMiscT;
+
+    private Transform _death2OnesT;
+    private Transform _solid2OnesT;
+
     private Main _main;
     private DataService _dataService;
 
-    public GameObject CurrentGame;
-
     private bool _hasError;
 
-    private int _xLength = 11;
-    private int _yLength = 8;
+    //private int _xLength = 11;
+    //private int _yLength = 8;
 
-    private readonly float _puzzleZIndex = -10f;
+    private const float PuzzleZIndex = -10f;
 
     private List<Bridge> _bridges;
 
@@ -47,37 +74,51 @@ public class MapGenerator : MonoBehaviour
         dataService.CreateDB();
     }
 
-    public void GenerateSql(bool update)
+    public void GenerateMapSql(Map map = null)
     {
+        if (map == null)
+            map = new Map
+            {
+                Id = 0,
+                Name = MapName,
+                Number = MapNumber,
+                GameObject = NewGameObject
+            };
+
+        if (map.GameObject == null)
+        {
+            Debug.LogError("No Map to " + (map.Id > 0 ? "update" : "create"));
+            return;
+        }
+
         _hasError = false;
 
         var dataService = new DataService("Database.db");
 
-        var map = new Map
-        {
-            Name = MapName,
-            Number = MapNumber
-        };
-        
         map.MapTiles = new List<MapTile>();
 
-        Transform[] allChildren = GetComponentsInChildren<Transform>(true);
+        Transform[] allChildren = map.GameObject.transform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
+            if (child.CompareTag("Untagged")) continue;
+
+            MapTile mapTile;
+
             switch (child.tag)
             {
                 case "Misc":
-                    var miscMapTile = GetMapTyle(child, TileType.Misc);
+                    mapTile = new MapTile().GetMapTyle(child, TileType.Misc);                    
+                    if (mapTile == null) break;
 
-                    if (miscMapTile != null)
-                    {
-                        miscMapTile.MapId = map.Id;
-                        map.MapTiles.Add(miscMapTile);
-                    }
+                    HasError(mapTile.Error);
+
+                    mapTile.MapId = map.Id;
+                    map.MapTiles.Add(mapTile);
+
                     break;
 
                 case "DeathZone":
-                    var deathMapTile = new MapTile
+                    mapTile = new MapTile
                     {
                         MapId = map.Id,
                         TyleType = TileType.DeathZone,
@@ -85,176 +126,163 @@ public class MapGenerator : MonoBehaviour
                         Y = child.position.y
                     };
 
-                    map.MapTiles.Add(deathMapTile);
+                    map.MapTiles.Add(mapTile);
+                    break;
+
+                case "Solid":
+                    mapTile = new MapTile
+                    {
+                        MapId = map.Id,
+                        TyleType = TileType.Solid,
+                        X = child.position.x,
+                        Y = child.position.y
+                    };
+
+                    map.MapTiles.Add(mapTile);
                     break;
             }
 
-            var puzzleMapTile = GetMapTyle(child, TileType.PuzzleObject);
+            mapTile = new MapTile().GetMapTyle(child, TileType.PuzzleObject);
+            if (mapTile == null) continue;
 
-            if (puzzleMapTile == null) continue;
+            HasError(mapTile.Error);
 
-            puzzleMapTile.MapId = map.Id;
-            map.MapTiles.Add(puzzleMapTile);
+            mapTile.MapId = map.Id;
+            map.MapTiles.Add(mapTile);
         }
-        
+
         if (_hasError) return;
 
-        map.Id = dataService.CreateMap(map);
-        foreach (var tiles in map.MapTiles)
-        {
-            tiles.MapId = map.Id;
-            Debug.Log(tiles.PrintObject(tiles.TyleType));
-        }
-        dataService.CreateTiles(map.MapTiles);
+        if (map.Id > 0)
+            dataService.DeleteMapTiles(map.Id);
 
-        Debug.Log("Map created : " + map);
+        map.Id = dataService.UpdateMap(map);
+
+        if (map.MapTiles.Count > 0)
+        {
+            foreach (var tiles in map.MapTiles)
+            {
+                tiles.MapId = map.Id;
+            }
+            dataService.CreateTiles(map.MapTiles);
+        }
+
+        NewGameObject = null;
+        CurrentMap = null;
+        MapName = "";
+        MapNumber = 0;
+        MapId = 0;
+
+        Debug.Log("Map transaction resolved: " + map);
     }
 
-    private MapTile GetMapTyle(Transform objT, TileType tileType)
+    private void HasError(string error)
     {
-        MapTile mapTile = null;
-
-        switch (tileType)
-        {
-            case TileType.Misc:
-
-                var misc = Misc.None;
-
-                switch (objT.gameObject.name)
-                {
-                    case "PipeConnector":
-                        misc = Misc.PipeConnector;
-                        break;
-                    case "Tutorial1":
-                        misc = Misc.Tutorial1;
-                        break;
-                    case "PitHorizontal2":
-                        misc = Misc.PitHorizontal2;
-                        break;
-                    case "PipeHorizontal":
-                        misc = Misc.PipeConnector;
-                        break;
-                }
-
-                if (misc != Misc.None)
-                {
-                    mapTile = new MapTile
-                    {
-                        TyleType = tileType,
-                        Misc = misc,
-                        Rotation = objT.eulerAngles.z,
-                        X = objT.position.x,
-                        Y = objT.position.y,
-                        Z = objT.position.z
-                    };
-                }
-                break;
-
-            case TileType.PuzzleObject:
-
-                switch (objT.tag)
-                {
-                    case "Player":
-
-                        mapTile = new MapTile
-                        {
-                            TyleType = tileType,
-                            X = objT.position.x,
-                            Y = objT.position.y,
-                            PuzzleObject = PuzzleObject.Player
-                        };
-                        break;
-
-                    case "Box":
-
-                        mapTile = new MapTile
-                        {
-                            TyleType = tileType,
-                            X = objT.position.x,
-                            Y = objT.position.y,
-                            PuzzleObject = PuzzleObject.Box
-                        };
-                        break;
-
-                    case "Bridge":
-
-                        mapTile = new MapTile
-                        {
-                            TyleType = tileType,
-                            X = objT.position.x,
-                            Y = objT.position.y,
-                            PuzzleObject = PuzzleObject.Bridge,
-                            BridgeId = objT.GetComponent<Bridge>().Id
-                        };
-
-                        if (mapTile.BridgeId == 0) HasError("Bridge has no Id.");
-
-                        break;
-
-                    case "Trigger":
-
-                        mapTile = new MapTile
-                        {
-                            TyleType = tileType,
-                            X = objT.position.x,
-                            Y = objT.position.y,
-                            PuzzleObject = PuzzleObject.Trigger,
-                            BridgeId = objT.GetComponent<Trigger>().Bridge.Id
-                        };
-
-                        if (mapTile.BridgeId == 0) HasError("Trigger has no BridgeId.");
-
-                        break;
-                }
-                break;
-
-            default:
-                throw new ArgumentOutOfRangeException("tileType", tileType, null);
-        }
-        return mapTile;
+        if (string.IsNullOrEmpty(error)) return;
+        
+        _hasError = true;
+        Debug.LogError(error);
     }
 
-    public void CreateMap(int mapId)
+    public void GenerateBaseMap(bool newMap = false)
     {
-        IEnumerable<MapTile> tiles = _dataService.GetTiles(mapId);
+        if (newMap)
+        {
+            MapName = "New";
+            CurrentMap = null;
+            MapNumber = 0;
+        }
+        else
+            MapName = CurrentMap.Name;
+
+        var go = GameObject.FindWithTag("GameScene");
+        DestroyImmediate(go);
+
+        go = Instantiate(Resources.Load("Prefabs/InitGameObj"), new Vector3(),
+            Quaternion.identity) as GameObject;
+
+        if (go == null) return;
+
+        _bridges = new List<Bridge>();
+
+        go.tag = "GameScene";
+        go.transform.localPosition = new Vector3(0f, 0f, 100f);
+        go.gameObject.name = "Game[ " + MapName + " ]";
+
+        _mapMiscT = new GameObject().transform;
+        _mapMiscT.SetParent(go.transform);
+        _mapMiscT.localPosition = new Vector3(0, 0, 0);
+        _mapMiscT.gameObject.name = "mapMisc";
+
+        _pitMiscT = new GameObject().transform;
+        _pitMiscT.SetParent(_mapMiscT);
+        _pitMiscT.localPosition = new Vector3(0, 0, 0);
+        _pitMiscT.gameObject.name = "_pit";
+
+        _hillMiscT = new GameObject().transform;
+        _hillMiscT.SetParent(_mapMiscT);
+        _hillMiscT.localPosition = new Vector3(0, 0, 0);
+        _hillMiscT.gameObject.name = "_hill";
+
+        _death2OnesT = new GameObject().transform;
+        _death2OnesT.SetParent(go.transform);
+        _death2OnesT.localPosition = new Vector3(0, 0, 0);
+        _death2OnesT.gameObject.name = "death2ones";
+
+        _solid2OnesT = new GameObject().transform;
+        _solid2OnesT.SetParent(go.transform);
+        _solid2OnesT.localPosition = new Vector3(0, 0, 0);
+        _solid2OnesT.gameObject.name = "solid2ones";
+
+        if (newMap)
+            NewGameObject = go;
+        else if (CurrentMap != null) CurrentMap.GameObject = go;
+    }
+
+    public void CreateMap(int mapId, bool inEditor = false)
+    {
+        IEnumerable<MapTile> tiles;
+
+        if (inEditor)
+        {
+            MapId = 0;
+
+            _dataService = new DataService("Database.db");
+            _main = Camera.main.gameObject.GetComponent<Main>();
+        }
+
+        CurrentMap = _dataService.GetMap(mapId);
+        tiles = _dataService.GetTiles(mapId);
+
+        _main.CurrentMapId = CurrentMap.Id;
+
+        GenerateBaseMap();
 
         if (tiles == null || !tiles.Any()) return;
 
-        _main.CurrentMapId = mapId;
-        _bridges = new List<Bridge>();
-
-        //Destroy(CurrentGame);
-
-        CurrentGame = Instantiate(Resources.Load("Prefabs/InitGameObj"), new Vector3(),
-            Quaternion.identity) as GameObject;
-
-        CurrentGame.transform.localPosition = new Vector3(0f, 0f, 100f);
-        CurrentGame.gameObject.name = "CurrentGame";
-
-        var mapMiscT = new GameObject().transform;
-        mapMiscT.SetParent(CurrentGame.transform);
-        mapMiscT.localPosition = new Vector3(0, 0, 0);
-        mapMiscT.gameObject.name = "mapMisc";
-
-        var death2onesT = new GameObject().transform;
-        death2onesT.SetParent(CurrentGame.transform);
-        death2onesT.localPosition = new Vector3(0, 0, 0);
-        death2onesT.gameObject.name = "death2ones";
-
         foreach (var tile in tiles)
         {
-            //Debug.Log(tile.PrintObject(tile.TyleType));
-
             switch (tile.TyleType)
             {
                 case TileType.Misc:
 
-                    CreateMisc(tile, mapMiscT);
+                    if (tile.Misc.ToString().Contains("Pit"))
+                        CreateMisc(tile, _pitMiscT, true);
+                    else if (tile.Misc.ToString().Contains("Hill"))
+                        CreateMisc(tile, _hillMiscT, true);
+                    else
+                        CreateMisc(tile, _mapMiscT);
+                    
                     break;
 
                 case TileType.DeathZone:
 
-                    CreateDeath2ones(tile, death2onesT);
+                    CreateDeath2Ones(tile);
+                    break;
+
+                case TileType.Solid:
+
+                    CreateSolid2Ones(tile);
                     break;
 
                 case TileType.PuzzleObject:
@@ -268,31 +296,40 @@ public class MapGenerator : MonoBehaviour
         }
     }
 
-    private void HasError(string error)
-    {
-        _hasError = true;
-        Debug.LogError(error);
-    }
-
-    private void CreateMisc(MapTile tile, Transform parentT)
+    private void CreateMisc(MapTile tile, Transform parentT, bool isPitOrHill = false)
     {
         GameObject objT = Instantiate(Resources.Load("Prefabs/Misc/" + tile.Misc), new Vector3(),
             Quaternion.identity) as GameObject;
 
         objT.transform.SetParent(parentT);
-        objT.transform.localPosition = new Vector3(tile.X, tile.Y, 0f);
-        objT.gameObject.name = tile.Misc + "[" + tile.X + ", " + tile.Y + "]";
+        objT.transform.localPosition = new Vector3(tile.X, tile.Y, -100f + tile.Z);
+
+        if (isPitOrHill)
+            objT.gameObject.name = tile.Misc + " [" + tile.X + ", " + tile.Y + "]";
+        else
+            objT.gameObject.name = tile.Misc.ToString();
+
         objT.transform.localEulerAngles = new Vector3(0, 0, tile.Rotation);
     }
 
-    private void CreateDeath2ones(MapTile tile, Transform parentT)
+    private void CreateDeath2Ones(MapTile tile)
     {
         GameObject objT = Instantiate(Resources.Load("Prefabs/Zone"), new Vector3(),
             Quaternion.identity) as GameObject;
 
-        objT.transform.SetParent(parentT);
-        objT.transform.localPosition = new Vector3(tile.X, tile.Y, _puzzleZIndex);
-        objT.gameObject.name = "Zone[" + tile.X + ", " + tile.Y + "]";
+        objT.transform.SetParent(_death2OnesT);
+        objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
+        objT.gameObject.name = "Zone [" + tile.X + ", " + tile.Y + "]";
+    }
+
+    private void CreateSolid2Ones(MapTile tile)
+    {
+        GameObject objT = Instantiate(Resources.Load("Prefabs/Solid"), new Vector3(),
+            Quaternion.identity) as GameObject;
+
+        objT.transform.SetParent(_solid2OnesT);
+        objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
+        objT.gameObject.name = "Solid [" + tile.X + ", " + tile.Y + "]";
     }
 
     private void CreatePuzzleObjects(MapTile tile)
@@ -306,8 +343,8 @@ public class MapGenerator : MonoBehaviour
                 objT = Instantiate(Resources.Load("Prefabs/Sphere"), new Vector3(), Quaternion.identity) as GameObject;
 
                 objT.gameObject.name = "Sphere";
-                objT.transform.SetParent(CurrentGame.transform);
-                objT.transform.localPosition = new Vector3(tile.X, tile.Y, _puzzleZIndex);
+                objT.transform.SetParent(CurrentMap.GameObject.transform);
+                objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
 
                 _main.Sphere = objT.GetComponent<Sphere>();
 
@@ -317,8 +354,8 @@ public class MapGenerator : MonoBehaviour
 
                 objT = Instantiate(Resources.Load("Prefabs/Box"), new Vector3(), Quaternion.identity) as GameObject;
                 objT.gameObject.name = "Box";
-                objT.transform.SetParent(CurrentGame.transform);
-                objT.transform.localPosition = new Vector3(tile.X, tile.Y, _puzzleZIndex);
+                objT.transform.SetParent(CurrentMap.GameObject.transform);
+                objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
 
                 objT.GetComponent<Box>().Initialize();
 
@@ -328,7 +365,7 @@ public class MapGenerator : MonoBehaviour
 
                 objT = Instantiate(Resources.Load("Prefabs/Bridge"), new Vector3(), Quaternion.identity) as GameObject;
                 objT.gameObject.name = "Bridge";
-                objT.transform.SetParent(CurrentGame.transform);
+                objT.transform.SetParent(CurrentMap.GameObject.transform);
                 objT.transform.localPosition = new Vector3(tile.X, tile.Y, 0f);
 
                 var b = objT.GetComponent<Bridge>();
@@ -345,8 +382,8 @@ public class MapGenerator : MonoBehaviour
 
                 objT = Instantiate(Resources.Load("Prefabs/Trigger"), new Vector3(), Quaternion.identity) as GameObject;
                 objT.gameObject.name = "Trigger";
-                objT.transform.SetParent(CurrentGame.transform);
-                objT.transform.localPosition = new Vector3(tile.X, tile.Y, _puzzleZIndex);
+                objT.transform.SetParent(CurrentMap.GameObject.transform);
+                objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
 
                 var bridge = _bridges.Single(item => item.Id == tile.BridgeId);
 
@@ -360,6 +397,14 @@ public class MapGenerator : MonoBehaviour
 
                 break;
 
+            case PuzzleObject.Finish:
+
+                objT = Instantiate(Resources.Load("Prefabs/Finish"), new Vector3(), Quaternion.identity) as GameObject;
+                objT.gameObject.name = "Finish " + "[" + tile.X + ", " + tile.Y + "]";
+                objT.transform.SetParent(CurrentMap.GameObject.transform);
+                objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
+                break;
+            
             default:
                 throw new ArgumentOutOfRangeException();
         }

@@ -6,7 +6,7 @@ using Assets.Scripts.Types;
 public class Zone : MonoBehaviour
 {
     public ZoneType ZoneType;
-    
+
     void OnTriggerEnter(Collider objC)
     {
         switch (ZoneType)
@@ -15,21 +15,21 @@ public class Zone : MonoBehaviour
 
                 if (objC.CompareTag("Sphere"))
                 {
-                    objC.transform.parent.GetComponent<Sphere>().Main.InitGame();
+                    objC.transform.parent.GetComponent<Sphere>().YouDeadBro();
+                }
+                else if (string.Equals(objC.gameObject.name, "ZoneCollider"))
+                {
+                    objC.transform.parent.gameObject.GetComponent<Box>().YouDeadBro();
+                    ZoneType = ZoneType.Walkable;
                 }
                 break;
 
             case ZoneType.Walkable:
-
 
                 break;
 
             default:
                 throw new ArgumentOutOfRangeException();
         }
-    }
-
-    void OnTriggerExit(Collider objC)
-    {
     }
 }

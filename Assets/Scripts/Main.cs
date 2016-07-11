@@ -125,7 +125,7 @@ public class Main : MonoBehaviour
     }
 
     public GameObject GameViewPanel;
-    public MapGenerator Game;
+    public MapGenerator MapGenerator;
 
     public Button RightButton;
     public Button LeftButton;
@@ -143,6 +143,9 @@ public class Main : MonoBehaviour
     // Use this for initialization
     void Start()
     {
+        var go = GameObject.FindWithTag("GameScene");
+        DestroyImmediate(go);
+
         DataService = new DataService("Database.db");
 
         // Attempt to get user
@@ -164,8 +167,8 @@ public class Main : MonoBehaviour
 
         GameViewPanel.SetActive(false);
 
-        Game.Initialize(this, DataService);
-        Game.gameObject.SetActive(false);
+        MapGenerator.Initialize(this, DataService);
+        MapGenerator.gameObject.SetActive(false);
 
         // Resolutions.
 
@@ -258,7 +261,7 @@ public class Main : MonoBehaviour
             case ButtonClick.GameSettingsButton:
 
                 GameViewPanel.SetActive(false);
-                Game.gameObject.SetActive(false);
+                MapGenerator.gameObject.SetActive(false);
 
                 // for now
                 ShowMainMenu();
@@ -272,13 +275,13 @@ public class Main : MonoBehaviour
         StartCoroutine(FinishLoaderWait());
     }
 
-    private void Login(User loggedUser, string name = null)
+    private void Login(User loggedUser, string username = null)
     {
         StartPanel.SetActive(false);
 
         if (loggedUser == null)
         {
-            DataService.CreateUser(name);
+            DataService.CreateUser(username);
             loggedUser = DataService.GetUser();
         }
 
@@ -291,6 +294,8 @@ public class Main : MonoBehaviour
     private void CreateMapButton(float x, float y, int mapId)
     {
         var go = Instantiate(Resources.Load("Prefabs/UI/Map")) as GameObject;
+
+        if (go == null) return;
 
         var rectTransform = go.GetComponent<RectTransform>();
         rectTransform.SetParent(MapsPanel.transform);
@@ -320,8 +325,8 @@ public class Main : MonoBehaviour
         if (mapId != 0)
             CurrentMapId = mapId;
 
-        if (Game.CurrentGame != null)
-            Destroy(Game.CurrentGame);
+        if (MapGenerator.CurrentMap != null && MapGenerator.CurrentMap.GameObject != null)
+            Destroy(MapGenerator.CurrentMap.GameObject);
 
         //-- StartLoading(true);
         StartCoroutine(LoaderWaitThenExecute(LoadThenExecute.MapLoad));
@@ -332,23 +337,28 @@ public class Main : MonoBehaviour
 
         MapsPanel.SetActive(false);
 
-        Game.CreateMap(CurrentMapId);
+        MapGenerator.CreateMap(CurrentMapId);
 
         TopBar.SetActive(false);
 
         SetupGameControlls();
         GameViewPanel.SetActive(true);
 
-        Game.gameObject.SetActive(true);
+        MapGenerator.gameObject.SetActive(true);
 
         //-- StartLoading(false);
         StartCoroutine(FinishLoaderWait());
     }
 
+    public int GetNextMapId()
+    {
+        return DataService.GetNextMapId(MapGenerator.CurrentMap.Number + 1);
+    }
+
     public void ShowMainMenu()
     {
-        if (Game.CurrentGame)
-            Game.CurrentGame.gameObject.SetActive(false);
+        if (MapGenerator.CurrentMap != null && MapGenerator.CurrentMap.GameObject)
+            MapGenerator.CurrentMap.GameObject.SetActive(false);
 
         MainMenuPanel.SetActive(true);
         TopBar.SetActive(true);
@@ -371,9 +381,6 @@ public class Main : MonoBehaviour
 
     public void SetupGameUi()
     {
-        Image image;
-        Text text;
-
         LoadingImage.transform.parent.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(_width, _height);
 
         //-- StartLoading(false);
@@ -382,6 +389,7 @@ public class Main : MonoBehaviour
         Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
+            Image image;
             switch (child.gameObject.name)
             {
                 case "TopBarBackground":
@@ -391,7 +399,7 @@ public class Main : MonoBehaviour
                     break;
 
                 case "ProfileName":
-                    text = child.gameObject.GetComponent<Text>();
+                    var text = child.gameObject.GetComponent<Text>();
                     var h = Logic.GetPercent(_height, 20);
                     text.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 30), Logic.GetPercent(h, 75));
                     text.rectTransform.localPosition = new Vector3(Logic.GetPercent(_width, 3), -h, 0f);
@@ -437,36 +445,12 @@ public class Main : MonoBehaviour
 
     private void SetupGameControlls()
     {
-        Image image;
-
-        var xPos = 0f;
-        var yPos = 4.07f;
-        var orthographicSize = 4.77f;
-
-        if (_width == 854)
-        {
-            yPos = 4.07f;
-            if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
-                ControllerType == ControllerType.Zas)
-            {
-                xPos = 5.59f;
-            }
-            else if (ControllerType == ControllerType.Classic)
-            {
-                xPos = 7.6f;
-            }
-            else
-            {
-                xPos = 7f;
-            }
-        }
-
-        GetComponent<Camera>().orthographicSize = orthographicSize;
-        _cameraTransform.position = new Vector3(xPos, yPos, 0);
-
+        SetupCamera();
+        
         Transform[] allChildren = _cameraTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
+            Image image;
             switch (child.gameObject.name)
             {
                 case "LeftBackground":
@@ -628,6 +612,74 @@ public class Main : MonoBehaviour
                     break;
             }
         }
+    }
+
+    private void SetupCamera()
+    {
+        var xPos = 5.5f;
+        var yPos = 4.07f;
+        var orthographicSize = 4.77f;
+        
+        if (Math.Abs(_width - 480) < 5)
+        {
+            orthographicSize = 5.5f;
+        }
+        if (Math.Abs(_width - 854) < 5)
+        {
+            yPos = 3.98f;
+            orthographicSize = 4.7f;
+            if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+                ControllerType == ControllerType.Zas)
+            {
+                xPos = 5.6f;
+            }
+            else if (ControllerType == ControllerType.Classic)
+            {
+                xPos = 7.6f;
+            }
+            else
+            {
+                xPos = 7f;
+            }
+        }
+        if (Math.Abs(_width - 800) < 5)
+        {
+            orthographicSize = 5;
+            if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+                ControllerType == ControllerType.Zas)
+            {
+                xPos = 5.5f;
+            }
+            else if (ControllerType == ControllerType.Classic)
+            {
+                xPos = 7.6f;
+            }
+            else
+            {
+                xPos = 7f;
+            }
+        }
+        if (Math.Abs(_width - 1024) < 5)
+        {
+            orthographicSize = 4.8f;
+            if (ControllerType == ControllerType.Default || ControllerType == ControllerType.DefaultPacked ||
+                ControllerType == ControllerType.Zas)
+            {
+                xPos = 5.5f;
+            }
+            else if (ControllerType == ControllerType.Classic)
+            {
+                xPos = 7.6f;
+            }
+            else
+            {
+                xPos = 7f;
+            }
+        }
+        
+
+        GetComponent<Camera>().orthographicSize = orthographicSize;
+        _cameraTransform.position = new Vector3(xPos, yPos, 0);
     }
 
     private IEnumerator LoaderWaitThenExecute(LoadThenExecute execiteAfter)

@@ -20,7 +20,7 @@ public class Trigger : MonoBehaviour
                 Bridge.BridgeState = ObjectState.Deactivated;
         }
     }
-    
+
     public Bridge Bridge;
 
     public void Initialize(Bridge bridge)   // from DB
@@ -30,20 +30,15 @@ public class Trigger : MonoBehaviour
 
     void OnTriggerEnter(Collider objC)
     {
-        if (TriggerState != ObjectState.Activated)
-            if (objC.tag.Contains("Box"))
-            {
-                TriggerState = ObjectState.Activated;
-                //objC.transform.parent.GetComponent<Box>().OnTopOfTrigger = true;
-            }
+        if (TriggerState == ObjectState.Activated) return;
+        if (string.Equals(objC.gameObject.name, "TriggerCollider"))
+            TriggerState = ObjectState.Activated;
     }
+
     void OnTriggerExit(Collider objC)
     {
-        if (TriggerState == ObjectState.Activated)
-            if (objC.tag.Contains("Box"))
-            {
-                TriggerState = ObjectState.Deactivated;
-                //objC.transform.parent.GetComponent<Box>().OnTopOfTrigger = false;
-            }
+        if (TriggerState != ObjectState.Activated) return;
+        if (string.Equals(objC.gameObject.name, "TriggerCollider"))
+            TriggerState = ObjectState.Deactivated;
     }
 }

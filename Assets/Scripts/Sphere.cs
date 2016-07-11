@@ -31,11 +31,25 @@ public class Sphere : MonoBehaviour
     [HideInInspector]
     public Box LeftBox;
 
+    private SpriteRenderer _sprite;
+
     public void Initialize(Main main)
     {
         Main = main;
         Controller = GetComponent<Controller>();
         Controller.Initialize(this);
+
+        Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
+        foreach (Transform objT in allChildren)
+        {
+            switch (objT.tag)
+            {
+                case "Sprite":
+
+                    _sprite = objT.gameObject.GetComponent<SpriteRenderer>();
+                    break;
+            }
+        }
     }
 
     public void MoveDirection(Move moveIndex)
@@ -114,5 +128,41 @@ public class Sphere : MonoBehaviour
             MoveDirection(Move.Down);
         if (Input.GetKeyUp(KeyCode.S))
             StopDirection(Move.Down);
+
+        if (FallInPit)
+            FallInPitAnim();
+    }
+
+    public bool Win;
+    public bool FallInPit;
+
+    private float _scaleLerpTime;
+
+    private void FallInPitAnim(bool outside = false)
+    {
+        transform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(0.85f, 0.85f, 1), _scaleLerpTime * 4);
+        _sprite.color = Color.Lerp(Color.white, new Color32(199, 199, 199, 255), _scaleLerpTime * 4);
+
+        _scaleLerpTime = _scaleLerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+
+        if (!(_scaleLerpTime >= 1)) return;
+
+        _scaleLerpTime = 0;
+
+        if (Win)
+            Main.InitGame(Main.GetNextMapId());
+        else
+            Main.InitGame();
+    }
+
+    public void YouDeadBro()
+    {
+        FallInPit = true;
+    }
+
+    public void YouWinBro()
+    {
+        FallInPit = true;
+        Win = true;
     }
 }

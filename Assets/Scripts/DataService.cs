@@ -5,6 +5,7 @@ using System.Collections;
 using System.IO;
 #endif
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using Assets.Scripts.Types;
 
 public class DataService
@@ -85,28 +86,6 @@ public class DataService
         _connection.CreateTable<MapTile>();
     }
 
-    //   public IEnumerable<Person> GetPersons(){
-    //	return _connection.Table<Person>();
-    //}
-
-    //public IEnumerable<Person> GetPersonsNamedRoberto(){
-    //	return _connection.Table<Person>().Where(x => x.Name == "Roberto");
-    //}
-
-    //public Person GetJohnny(){
-    //	return _connection.Table<Person>().Where(x => x.Name == "Johnny").FirstOrDefault();
-    //}
-
-    //public Person CreatePerson(){
-    //	var p = new Person{
-    //			Name = "Johnny",
-    //			Surname = "Mnemonic",
-    //			Age = 21
-    //	};
-    //	_connection.Insert (p);
-    //	return p;
-    //}
-
     /*
      * User
      * * --------------------------------------------------------------------------------------------------------------------------------------
@@ -156,6 +135,22 @@ public class DataService
         return map.Id;
     }
 
+    public int UpdateMap(Map map)
+    {
+        _connection.Update(map);
+        return map.Id;
+    }
+
+    public Map GetMap(int mapId)
+    {
+        return _connection.Table<Map>().Where(x => x.Id == mapId).FirstOrDefault();
+    }
+
+    public int GetNextMapId(int number)
+    {
+        return _connection.Table<Map>().Where(x => x.Number == number).FirstOrDefault().Id;
+    }
+
     public void CreateTiles(List<MapTile> mapTiles)
     {
         _connection.InsertAll(mapTiles);
@@ -171,6 +166,12 @@ public class DataService
         return _connection.Table<MapTile>().Where(x => x.MapId == mapId);
     }
 
+    public void DeleteMapTiles(int mapId)
+    {
+        var sql = string.Format("delete from MapTile where MapId = {0}", mapId);
+        _connection.ExecuteSql(sql);
+    }
+    
     /*
      * Map - END
      * * --------------------------------------------------------------------------------------------------------------------------------------

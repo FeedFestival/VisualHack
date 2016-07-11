@@ -103,7 +103,7 @@ public class Controller : MonoBehaviour
         }
     }
 
-    void FixedUpdate()
+    void Update()
     {
         if (_pushLeft == false && _pushUp == false && _pushDown == false)
             if (CheckUserPress(Direction.Right))

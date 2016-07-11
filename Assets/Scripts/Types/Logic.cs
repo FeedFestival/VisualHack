@@ -72,17 +72,25 @@ namespace Assets.Scripts.Types
 
     public enum TileType
     {
-        Empty, Misc, DeathZone, PuzzleObject
+        Empty, Misc, DeathZone, PuzzleObject, Solid
     }
 
     public enum Misc
     {
-        None, PipeConnector, Tutorial1, PitHorizontal2, PipeHorizontal
+        None, PipeConnector, Tutorial1, PipeHorizontal,
+
+        Pit00, Pit01, Pit02, Pit10, Pit11, Pit12, Pit20, Pit21, Pit22,
+        PitA00, PitA22,
+        PitS00, PitS01, PitS02, PitS20, PitS21, PitS22,
+        Hill00, Hill01, Hill02, Hill10, Hill11, Hill12, Hill20, Hill21, Hill22,
+        HillS00, HillS02, HillS20, HillS22,
+        Hill
     }
 
     public enum PuzzleObject
     {
-        Player, Box, Bridge, Trigger
+        Player, Box, Bridge, Trigger,
+        Finish
     }
 
     public static class Logic

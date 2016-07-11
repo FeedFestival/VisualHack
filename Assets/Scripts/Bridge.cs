@@ -59,7 +59,7 @@ public class Bridge : MonoBehaviour
         Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
         foreach (Transform objT in allChildren)
         {
-            if (objT.gameObject.name == "BridgeRoadSprite")
+            if (string.Equals(objT.gameObject.name, "BridgeRoadSprite"))
             {
                 _bridgeRoadTransform = objT;
 
