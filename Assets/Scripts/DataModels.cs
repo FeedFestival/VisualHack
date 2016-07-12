@@ -28,6 +28,8 @@ public class User
     public bool IsUsingSound { get; set; }
     public int ControllerType { get; set; }
 
+    public long FacebookId { get; set; }
+
     public override string ToString()
     {
         return string.Format("[User: Id={0}, Name={1}, Maps={2}, IsUsingSound={3}, ControllerType={4}]", Id, Name, Maps, IsUsingSound, ControllerType);
@@ -222,11 +224,11 @@ public class MapTile
                             Y = objT.position.y,
                             PuzzleObject = PuzzleObject.Finish
                         };
-                        
+
                         break;
                 }
                 break;
-                
+
             default:
                 mapTile.Error = "ArgumentOutOfRangeException";
                 break;
@@ -271,7 +273,7 @@ public class MapTile
             return Misc.PitS21;
         if (goName.Contains("PitS22"))
             return Misc.PitS22;
-        
+
         if (goName.Contains("Hill00"))
             return Misc.Hill00;
         if (goName.Contains("Hill01"))

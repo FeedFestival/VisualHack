@@ -2,6 +2,7 @@
 using UnityEngine;
 using System.Linq;
 using Assets.Scripts.Types;
+using UnityEngine.UI;
 
 public class Main : MonoBehaviour
 {
@@ -11,6 +12,10 @@ public class Main : MonoBehaviour
     public GameProperties GameProperties;
     [HideInInspector]
     public LoadingController LoadingController;
+
+    private FacebookController _facebookController;
+
+    private User _loggedUser;
 
     private GameUi _gameUi;
 
@@ -31,6 +36,27 @@ public class Main : MonoBehaviour
         }
     }
 
+    [HideInInspector]
+    public InputField DebugTextGameObject;
+    private string _debugText;
+    public string DebugText
+    {
+        get { return _debugText; }
+        set
+        {
+            _debugText = value + Environment.NewLine + _debugText;
+            if (_gameUi.DebugContainer.transform.parent.gameObject.activeSelf == false)
+                _gameUi.DebugContainer.transform.parent.gameObject.SetActive(true);
+            DebugTextGameObject.text = _debugText;
+        }
+    }
+
+    public void ClearDebugLog()
+    {
+        _debugText = string.Empty;
+        //DebugContainer.SetActive(!DebugContainer.activeSelf);
+    }
+
     // Use this for initialization
     void Start()
     {
@@ -46,27 +72,106 @@ public class Main : MonoBehaviour
         GameProperties = GetComponent<GameProperties>();
         GameProperties.Initialize(this);
 
-        // Init all UI variables
         _gameUi = GetComponent<GameUi>();
         _gameUi.Initialize(this);
 
-        // Attempt to get user
-        var user = DataService.GetUser();
+        /*
+         * Facebook
+         */
+        _facebookController = GetComponent<FacebookController>();
 
-        if (user != null)
-            Login(user);
-        else
-        {
-            _gameUi.StartPanel.SetActive(true);
-            _gameUi.TopBarPanel.SetActive(false);
-            _gameUi.MainMenuPanel.SetActive(false);
-        }
+        _loggedUser = DataService.GetUser();
+        FacebookInitializationComplete();
+
         _gameUi.SettingsPanel.SetActive(false);
         _gameUi.MapsPanel.SetActive(false);
         _gameUi.GameViewPanel.SetActive(false);
 
         _mapGenerator.Initialize(this, DataService);
         _mapGenerator.gameObject.SetActive(false);
+    }
+
+    public void FacebookInitializationComplete(User user = null)
+    {
+        if (user != null)
+        {
+            if (_loggedUser == null)
+            {
+                user.ControllerType = (int)ControllerType.Classic;
+
+                DataService.CreateUser(user);
+            }
+            else
+            {
+                user.Id = _loggedUser.Id;
+                user.IsUsingSound = _loggedUser.IsUsingSound;
+
+                DataService.UpdateUser(user);
+            }
+            _loggedUser = DataService.GetLastUser();
+        }
+
+        if (_loggedUser == null)
+        {
+            _gameUi.StartPanel.SetActive(true);
+            _gameUi.TopBarPanel.SetActive(false);
+            _gameUi.MainMenuPanel.SetActive(false);
+        }
+        else
+        {
+            if (_loggedUser.FacebookId > 0 && user == null)
+                SetProfilePicture();
+            else if (user != null)
+                _facebookController.GetProfilePicture();
+
+            Login();
+        }
+    }
+
+    private void Login(bool isNew = false)
+    {
+        _gameUi.StartPanel.SetActive(false);
+
+        if (isNew)
+        {
+            DataService.CreateUser(_loggedUser);
+            _loggedUser = DataService.GetLastUser();
+        }
+
+        if (_loggedUser.FacebookId < 1)
+        {
+            _gameUi.ProfileName.gameObject.SetActive(false);
+
+            _gameUi.ProfilePicture.gameObject.SetActive(false);
+            _gameUi.ProfilePicture.transform.parent.gameObject.SetActive(false);
+
+            _gameUi.FacebookLoginButton.gameObject.SetActive(true);
+        }
+        else
+        {
+            _gameUi.FacebookLoginButton.gameObject.SetActive(false);
+
+            _gameUi.ProfileName.text = _loggedUser.Name;
+
+            _gameUi.ProfileName.gameObject.SetActive(true);
+            _gameUi.ProfilePicture.gameObject.SetActive(true);
+            _gameUi.ProfilePicture.transform.parent.gameObject.SetActive(true);
+        }
+        GameProperties.ControllerType = (ControllerType)_loggedUser.ControllerType;
+
+        ShowMainMenu();
+    }
+
+    public void SetProfilePicture(Texture2D texture = null)
+    {
+        string picName = Logic.GetProfilePictureName(_loggedUser.Name, _loggedUser.FacebookId);
+
+        if (texture != null)
+            Logic.SavePic(texture, texture.width, texture.height, picName);
+
+        texture = (Texture2D)Resources.Load("ProfilePictures/" + picName);
+
+        _gameUi.ProfilePicture.sprite = Sprite.Create(texture, new Rect(0, 0, 128, 128), new Vector2());
     }
 
     public void ButtonClicked(int button)
@@ -87,11 +192,15 @@ public class Main : MonoBehaviour
     {
         switch (_buttonClick)
         {
-            case ButtonClick.NextButton:
+            case ButtonClick.PlayOfflineButton:
 
-                if (string.IsNullOrEmpty(_gameUi.UserInputField.text.TrimEnd()))
-                    return;
-                Login(null, _gameUi.UserInputField.text);
+                _loggedUser = new User
+                {
+                    Name = "Anonymouse",
+                    ControllerType = (int)ControllerType.Classic
+                };
+
+                Login(true);
                 break;
 
             case ButtonClick.SettingsButton:
@@ -137,32 +246,16 @@ public class Main : MonoBehaviour
 
                 break;
 
+            case ButtonClick.LoginButton:
+
+                _facebookController.Initialize(this);
+
+                break;
+
             default:
                 throw new ArgumentOutOfRangeException();
         }
         StartCoroutine(LoadingController.FinishLoaderWait());
-    }
-
-    private void Login(User loggedUser, string username = null)
-    {
-        _gameUi.StartPanel.SetActive(false);
-
-        if (loggedUser == null)
-        {
-            var user = new User
-            {
-                Name = username,
-                ControllerType = (int)ControllerType.Classic
-            };
-
-            DataService.CreateUser(user);
-            loggedUser = DataService.GetUser();
-        }
-
-        _gameUi.ProfileName.text = loggedUser.Name;
-        GameProperties.ControllerType = (ControllerType)loggedUser.ControllerType;
-
-        ShowMainMenu();
     }
 
     public void InitGame(int mapId, bool reload = false)
@@ -208,7 +301,12 @@ public class Main : MonoBehaviour
     {
         GameProperties.ControllerType = (ControllerType)controllerType;
 
-        DataService.UpdateUserControllerType(controllerType);
+        var user = new User
+        {
+            Id = 1,
+            ControllerType = controllerType
+        };
+        DataService.UpdateUser(user);
 
         ButtonClicked((int)ButtonClick.SettingsBackButton);
     }

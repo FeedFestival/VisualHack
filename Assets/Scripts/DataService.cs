@@ -5,6 +5,7 @@ using System.Collections;
 using System.IO;
 #endif
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using Assets.Scripts.Types;
 
@@ -96,13 +97,8 @@ public class DataService
         _connection.Insert(user);
     }
 
-    public void UpdateUserControllerType(int controllerType)
+    public void UpdateUser(User user)
     {
-        var user = new User
-        {
-            Id = 1,
-            ControllerType = controllerType
-        };
         int rowsAffected = _connection.Update(user);
         Debug.Log("(UPDATE User) rowsAffected : " + rowsAffected);
     }
@@ -110,6 +106,16 @@ public class DataService
     public User GetUser()
     {
         return _connection.Table<User>().Where(x => x.Id == 1).FirstOrDefault();
+    }
+
+    public User GetLastUser()
+    {
+        return _connection.Table<User>().Last();
+    }
+
+    public User GetUserByFacebookId(int facebookId)
+    {
+        return _connection.Table<User>().Where(x => x.FacebookId == facebookId).FirstOrDefault();
     }
 
     /*

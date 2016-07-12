@@ -8,7 +8,9 @@ public class LoadingController : MonoBehaviour
     private Main _main;
 
     private Image _loadingContainer;
+    [HideInInspector]
     public Text LoadingIconText;
+    [HideInInspector]
     public Text LoadingIconCircle;
 
 
@@ -26,7 +28,7 @@ public class LoadingController : MonoBehaviour
                 -Logic.GetPercent(_main.GameProperties.Height / 2, 60),
                 0
                 );
-            
+
             _loadingContainer = _loadingIcon.transform.parent.GetComponent<Image>();
             _loadingContainer.gameObject.SetActive(true);
             _loadingContainer.rectTransform.sizeDelta = new Vector2(_main.GameProperties.Width, _main.GameProperties.Height);

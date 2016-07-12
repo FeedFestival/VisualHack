@@ -10,29 +10,20 @@ public class GameUi : MonoBehaviour
 {
     private Main _main;
 
-    private GameObject _debugContainer;
+    [HideInInspector]
+    public GameObject DebugContainer;
 
     [HideInInspector]
-    public GameObject StartPanel,MainMenuPanel,TopBarPanel,SettingsPanel,MapsPanel,GameViewPanel;
+    public GameObject StartPanel, MainMenuPanel, TopBarPanel, SettingsPanel, MapsPanel, GameViewPanel;
 
     [HideInInspector]
-    public InputField UserInputField;
+    public Button FacebookLoginButton;
     [HideInInspector]
     public Text ProfileName;
-    
-    private InputField _debugTextGameObject;
-    private string _debugText;
-    public string DebugText
-    {
-        get { return _debugText; }
-        set
-        {
-            _debugText = value + Environment.NewLine + _debugText;
-            if (_debugContainer.transform.parent.gameObject.activeSelf == false)
-                _debugContainer.transform.parent.gameObject.SetActive(true);
-            _debugTextGameObject.text = _debugText;
-        }
-    }
+    [HideInInspector]
+    public Image ProfilePicture;
+
+    private Image _profilePictureContainer, _topBarBackground;
 
     private Button _rightController, _leftController, _downController, _upController;
 
@@ -54,6 +45,7 @@ public class GameUi : MonoBehaviour
         foreach (Transform child in allChildren)
         {
             Image image;
+            float h, wSize, hSize;
             switch (child.gameObject.name)
             {
                 case "LoadingIcon":
@@ -69,11 +61,11 @@ public class GameUi : MonoBehaviour
                     break;
 
                 case "DebugContainer":
-                    _debugContainer = child.gameObject;
+                    DebugContainer = child.gameObject;
                     break;
 
                 case "DebugText":
-                    _debugTextGameObject = child.GetComponent<InputField>();
+                    _main.DebugTextGameObject = child.GetComponent<InputField>();
                     break;
 
                 //----------------------------------
@@ -81,8 +73,8 @@ public class GameUi : MonoBehaviour
                     StartPanel = child.gameObject;
                     break;
 
-                case "UserInputField":
-                    UserInputField = child.GetComponent<InputField>();
+                case "FacebookLoginButton":
+                    FacebookLoginButton = child.GetComponent<Button>();
                     break;
 
                 case "MainMenuPanel":
@@ -102,16 +94,38 @@ public class GameUi : MonoBehaviour
                     break;
 
                 case "TopBarBackground":
-                    image = child.gameObject.GetComponent<Image>();
-                    image.rectTransform.sizeDelta = new Vector3(_width, Logic.GetPercent(_height, 20));
-                    image.rectTransform.localPosition = new Vector3(_leftPoint, _topPoint, 0f);
+                    _topBarBackground = child.GetComponent<Image>();
+                    _topBarBackground.rectTransform.sizeDelta = new Vector3(_width, Logic.GetPercent(_height, 20));
+                    _topBarBackground.rectTransform.localPosition = new Vector3(_leftPoint, _topPoint, 0f);
+                    break;
+
+                case "ProfilePictureContainer":
+                    _profilePictureContainer = child.GetComponent<Image>();
+
+                    hSize = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 60);
+                    h = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 20);
+
+                    _profilePictureContainer.rectTransform.sizeDelta = new Vector3(hSize, hSize);
+                    _profilePictureContainer.rectTransform.localPosition = new Vector3(Logic.GetPercent(_width, 2), -h, 0f);
+                    break;
+
+                case "ProfilePicture":
+                    ProfilePicture = child.GetComponent<Image>();
+
+                    hSize = Logic.GetPercent(_profilePictureContainer.rectTransform.sizeDelta.y, 90);
+
+                    ProfilePicture.rectTransform.sizeDelta = new Vector3(hSize, hSize);
                     break;
 
                 case "ProfileName":
                     ProfileName = child.gameObject.GetComponent<Text>();
-                    var h = Logic.GetPercent(_height, 20);
-                    ProfileName.rectTransform.sizeDelta = new Vector3(Logic.GetPercent(_width, 30), Logic.GetPercent(h, 75));
-                    ProfileName.rectTransform.localPosition = new Vector3(Logic.GetPercent(_width, 3), -h, 0f);
+
+                    wSize = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.x, 30);
+                    hSize = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 60);
+                    h = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 20);
+
+                    ProfileName.rectTransform.sizeDelta = new Vector3(wSize, hSize);
+                    ProfileName.rectTransform.localPosition = new Vector3(Logic.GetPercent(_width, 10), -h, 0f);
                     break;
 
                 case "SettingsButton":
@@ -359,11 +373,5 @@ public class GameUi : MonoBehaviour
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Up); });
 
         trigger.triggers.Add(entry);
-    }
-
-    public void ShowDebugLog()
-    {
-        _debugText = string.Empty;
-        _debugContainer.SetActive(!_debugContainer.activeSelf);
     }
 }
