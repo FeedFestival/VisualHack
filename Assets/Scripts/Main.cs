@@ -169,7 +169,7 @@ public class Main : MonoBehaviour
         if (texture != null)
             Logic.SavePic(texture, texture.width, texture.height, picName);
 
-        texture = (Texture2D)Resources.Load("ProfilePictures/" + picName);
+        texture = Logic.ReadPic(picName);
 
         _gameUi.ProfilePicture.sprite = Sprite.Create(texture, new Rect(0, 0, 128, 128), new Vector2());
     }

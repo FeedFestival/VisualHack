@@ -136,8 +136,8 @@ namespace Assets.Scripts.Types
 
         public static string SavePic(Texture2D pic, int width, int height, string picName)
         {
-            string path = Application.dataPath + string.Format("/Resources/ProfilePictures/{0}.png", picName);
-            
+            string path = Application.persistentDataPath + string.Format("/{0}.png", picName);
+            Debug.Log(path);
             try
             {
                 byte[] bytes = pic.EncodeToPNG();
@@ -150,6 +150,25 @@ namespace Assets.Scripts.Types
             }
 
             return path;
+        }
+
+        public static Texture2D ReadPic(string picName)
+        {
+            string path = Application.persistentDataPath + string.Format("/{0}.png", picName);
+            Debug.Log(path);
+            
+            try
+            {
+                var bytes = File.ReadAllBytes(path);
+                Texture2D tex = new Texture2D(128, 128);
+                tex.LoadImage(bytes);
+                return tex;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+            return null;
         }
 
         // Take a shot immediately
