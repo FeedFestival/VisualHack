@@ -33,8 +33,16 @@ public class GameUi : MonoBehaviour
     {
         _main = main;
 
-        _width = _main.GameProperties.Width;
-        _height = _main.GameProperties.Height;
+        RefreshUi();
+    }
+
+    public void RefreshUi(bool fromInspector = false)
+    {
+        if (fromInspector == false)
+        {
+            _width = _main.GameProperties.Width;
+            _height = _main.GameProperties.Height;
+        }
 
         _rightPoint = _width / 2.0f;
         _leftPoint = -_rightPoint;
@@ -44,20 +52,43 @@ public class GameUi : MonoBehaviour
         Transform[] allChildren = GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
+            GameObject go;
             Image image;
             float h, wSize, hSize;
             switch (child.gameObject.name)
             {
+                case "Canvas":
+                    if (fromInspector)
+                    {
+                        go = child.gameObject;
+                        go.GetComponent<RectTransform>().sizeDelta = new Vector2(_width, _height);
+                    }
+                    break;
+
                 case "LoadingIcon":
-                    _main.LoadingController.LoadingIcon = child.gameObject;
+                    if (fromInspector)
+                    {
+                        go = child.gameObject;
+                        go.GetComponent<RectTransform>().localPosition = new Vector3(
+                                                Logic.GetPercent(_width / 2, 80),
+                                                -Logic.GetPercent(_height / 2, 70),
+                                                0
+                                                );
+                        var image2 = go.transform.parent.GetComponent<Image>();
+                        image2.rectTransform.sizeDelta = new Vector2(_width, _height);
+                    }
+                    else
+                        _main.LoadingController.LoadingIcon = child.gameObject;
                     break;
 
                 case "LoadingIconText":
-                    _main.LoadingController.LoadingIconText = child.gameObject.GetComponent<Text>();
+                    if (fromInspector == false)
+                        _main.LoadingController.LoadingIconText = child.gameObject.GetComponent<Text>();
                     break;
 
                 case "LoadingIconCircle":
-                    _main.LoadingController.LoadingIconCircle = child.gameObject.GetComponent<Text>();
+                    if (fromInspector == false)
+                        _main.LoadingController.LoadingIconCircle = child.gameObject.GetComponent<Text>();
                     break;
 
                 case "DebugContainer":
@@ -65,7 +96,8 @@ public class GameUi : MonoBehaviour
                     break;
 
                 case "DebugText":
-                    _main.DebugTextGameObject = child.GetComponent<InputField>();
+                    if (fromInspector == false)
+                        _main.DebugTextGameObject = child.GetComponent<InputField>();
                     break;
 
                 //----------------------------------
@@ -75,6 +107,12 @@ public class GameUi : MonoBehaviour
 
                 case "FacebookLoginButton":
                     FacebookLoginButton = child.GetComponent<Button>();
+                    //wSize = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.x, 30);
+                    hSize = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 60);
+                    h = Logic.GetPercent(_topBarBackground.rectTransform.sizeDelta.y, 20);
+
+                    FacebookLoginButton.GetComponent<RectTransform>().sizeDelta = new Vector3(200, hSize);
+                    FacebookLoginButton.GetComponent<RectTransform>().localPosition = new Vector3(Logic.GetPercent(_width, 2), -h, 0f);
                     break;
 
                 case "MainMenuPanel":
@@ -127,7 +165,7 @@ public class GameUi : MonoBehaviour
                     ProfileName.rectTransform.sizeDelta = new Vector3(wSize, hSize);
                     ProfileName.rectTransform.localPosition = new Vector3(Logic.GetPercent(_width, 10), -h, 0f);
                     break;
-
+                    
                 case "SettingsButton":
                     image = child.gameObject.GetComponent<Image>();
                     image.rectTransform.localPosition = new Vector3(_rightPoint - Logic.GetPercent(_width, 6), _bottomPoint - (-Logic.GetPercent(_height, 90)), 0f);
@@ -169,6 +207,56 @@ public class GameUi : MonoBehaviour
                     break;
             }
         }
+    }
+
+    public int InspectorScreenWidth;
+    public int InspectorScreenHeight;
+    public string InspectorScreenName;
+    public void RefreshCameraTransform()
+    {
+        _width = (float)InspectorScreenWidth;
+        _height = (float)InspectorScreenHeight;
+
+        var orthographicSize = 4.77f;
+        if (Math.Abs(_width - 480) < 5)
+        {
+            orthographicSize = 5.5f;
+        }
+        else if (Math.Abs(_width - 854) < 5)
+        {
+            orthographicSize = 4.7f;
+        }
+        else if (Math.Abs(_width - 800) < 5)
+        {
+            orthographicSize = 5;
+        }
+        else if (Math.Abs(_width - 1024) < 5)
+        {
+            orthographicSize = 4.8f;
+        }
+        GetComponent<Camera>().orthographicSize = orthographicSize;
+
+        var xPos = 5.5f;
+        var yPos = 4.07f;
+
+        if (Math.Abs(_width - 480) < 5)
+        {
+
+        }
+        else if (Math.Abs(_width - 854) < 5)
+        {
+            yPos = 3.98f;
+            xPos = 7.6f;
+        }
+        else if (Math.Abs(_width - 800) < 5)
+        {
+            xPos = 7.6f;
+        }
+        else if (Math.Abs(_width - 1024) < 5)
+        {
+            xPos = 7.6f;
+        }
+        transform.position = new Vector3(xPos, yPos, -25);
     }
 
     public void SetupMapsPanel()

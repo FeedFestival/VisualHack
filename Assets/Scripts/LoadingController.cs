@@ -24,8 +24,8 @@ public class LoadingController : MonoBehaviour
             _loadingIcon = value;
 
             _loadingIcon.GetComponent<RectTransform>().localPosition = new Vector3(
-                Logic.GetPercent(_main.GameProperties.Width / 2, 75),
-                -Logic.GetPercent(_main.GameProperties.Height / 2, 60),
+                Logic.GetPercent(_main.GameProperties.Width / 2, 80),
+                -Logic.GetPercent(_main.GameProperties.Height / 2, 70),
                 0
                 );
 
