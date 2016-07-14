@@ -1,5 +1,5 @@
 ﻿using System;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using UnityEngine;
 
 public class Controller : MonoBehaviour
@@ -40,7 +40,7 @@ public class Controller : MonoBehaviour
     private void MoveUpdate(Vector3 endMarker, ref bool referenceBool)
     {
         _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _lerpTime);
-        _lerpTime = _lerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+        _lerpTime = _lerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_lerpTime >= 1)) return;
 

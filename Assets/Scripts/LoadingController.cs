@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using UnityEngine.UI;
 
 public class LoadingController : MonoBehaviour
@@ -23,15 +23,15 @@ public class LoadingController : MonoBehaviour
         {
             _loadingIcon = value;
 
-            _loadingIcon.GetComponent<RectTransform>().localPosition = new Vector3(
-                Logic.GetPercent(_main.GameProperties.Width / 2, 80),
-                -Logic.GetPercent(_main.GameProperties.Height / 2, 70),
-                0
-                );
+            //_loadingIcon.GetComponent<RectTransform>().localPosition = new Vector3(
+            //    UiUtils.GetPercent(_main.GameProperties.Width / 2, 80),
+            //    -UiUtils.GetPercent(_main.GameProperties.Height / 2, 70),
+            //    0
+            //    );
 
             _loadingContainer = _loadingIcon.transform.parent.GetComponent<Image>();
             _loadingContainer.gameObject.SetActive(true);
-            _loadingContainer.rectTransform.sizeDelta = new Vector2(_main.GameProperties.Width, _main.GameProperties.Height);
+            //_loadingContainer.rectTransform.sizeDelta = new Vector2(_main.GameProperties.Width, _main.GameProperties.Height);
             StartCoroutine(FinishLoaderWait());
         }
     }
@@ -77,8 +77,6 @@ public class LoadingController : MonoBehaviour
         StartFade();
 
         LoadingIcon.SetActive(true);
-        if (string.IsNullOrEmpty(LoadingIconCircle.text))
-            LoadingIconCircle.text = Logic.circle;
         LoadingIconText.gameObject.SetActive(false);
 
         yield return new WaitForSeconds(0.3f);
@@ -106,29 +104,29 @@ public class LoadingController : MonoBehaviour
     {
         if (_startFadeIn)
         {
-            _loadingContainer.color = Color.Lerp(Logic.Transparent, Logic.Black, _fadeLerpTime);
-            LoadingIconCircle.color = Color.Lerp(Logic.Transparent, Logic.WhiteTransparent, _fadeLerpTime);
-            LoadingIconText.color = Color.Lerp(Logic.Transparent, Logic.White, _fadeLerpTime);
+            _loadingContainer.color = Color.Lerp(UiUtils.Transparent, UiUtils.Black, _fadeLerpTime);
+            LoadingIconCircle.color = Color.Lerp(UiUtils.Transparent, UiUtils.WhiteTransparent, _fadeLerpTime);
+            LoadingIconText.color = Color.Lerp(UiUtils.Transparent, UiUtils.White, _fadeLerpTime);
         }
         else if (_startFadeOut)
         {
-            _loadingContainer.color = Color.Lerp(Logic.Black, Logic.Transparent, _fadeLerpTime);
-            LoadingIconCircle.color = Color.Lerp(Logic.WhiteTransparent, Logic.Transparent, _fadeLerpTime);
-            LoadingIconText.color = Color.Lerp(Logic.White, Logic.Transparent, _fadeLerpTime);
+            _loadingContainer.color = Color.Lerp(UiUtils.Black, UiUtils.Transparent, _fadeLerpTime);
+            LoadingIconCircle.color = Color.Lerp(UiUtils.WhiteTransparent, UiUtils.Transparent, _fadeLerpTime);
+            LoadingIconText.color = Color.Lerp(UiUtils.White, UiUtils.Transparent, _fadeLerpTime);
         }
 
-        _fadeLerpTime = _fadeLerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+        _fadeLerpTime = _fadeLerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_fadeLerpTime >= 1)) return;
 
         if (_startFadeIn)
         {
-            _loadingContainer.color = Logic.Black;
+            _loadingContainer.color = UiUtils.Black;
             _startFadeIn = false;
         }
         else if (_startFadeOut)
         {
-            _loadingContainer.color = Logic.Transparent;
+            _loadingContainer.color = UiUtils.Transparent;
             _startFadeOut = false;
 
             _loadingContainer.gameObject.SetActive(false);

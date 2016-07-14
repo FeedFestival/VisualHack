@@ -1,6 +1,6 @@
 ﻿using System;
 using UnityEngine;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 
 public class Box : MonoBehaviour
 {
@@ -171,7 +171,7 @@ public class Box : MonoBehaviour
     private void MoveUpdate(Vector3 endMarker, ref bool referenceBool)
     {
         _thisTransform.position = Vector3.Lerp(_startMarker, endMarker, _lerpTime);
-        _lerpTime = _lerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+        _lerpTime = _lerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_lerpTime >= 1)) return;
 
@@ -301,7 +301,7 @@ public class Box : MonoBehaviour
         _thisTransform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(0.85f, 0.85f, 1), _scaleLerpTime * 4);
         _boxSprite.color = Color.Lerp(Color.white, new Color32(199, 199, 199, 255), _scaleLerpTime * 4);
         
-        _scaleLerpTime = _scaleLerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+        _scaleLerpTime = _scaleLerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_scaleLerpTime >= 1)) return;
 

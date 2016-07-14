@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Linq;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
@@ -164,12 +164,12 @@ public class Main : MonoBehaviour
 
     public void SetProfilePicture(Texture2D texture = null)
     {
-        string picName = Logic.GetProfilePictureName(_loggedUser.Name, _loggedUser.FacebookId);
+        string picName = Utils.GetProfilePictureName(_loggedUser.Name, _loggedUser.FacebookId);
 
         if (texture != null)
-            Logic.SavePic(texture, texture.width, texture.height, picName);
+            Utils.SavePic(texture, texture.width, texture.height, picName);
 
-        texture = Logic.ReadPic(picName);
+        texture = Utils.ReadPic(picName);
 
         _gameUi.ProfilePicture.sprite = Sprite.Create(texture, new Rect(0, 0, 128, 128), new Vector2());
     }

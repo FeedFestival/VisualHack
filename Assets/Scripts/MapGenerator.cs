@@ -2,7 +2,7 @@
 using UnityEngine;
 using System.Collections.Generic;
 using System.Linq;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 
 [ExecuteInEditMode]
 public class MapGenerator : MonoBehaviour

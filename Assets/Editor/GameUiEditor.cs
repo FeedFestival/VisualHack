@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Configuration;
 using System.Linq;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using NUnit.Framework.Constraints;
 using UnityEditor;
 
@@ -21,7 +21,7 @@ public class GameUiEditor : Editor
         set
         {
             _androidViewType = value;
-            Logic.AndroidViewType = _androidViewType;
+            EditorUtils.AndroidViewType = _androidViewType;
         }
         get { return _androidViewType; }
     }
@@ -38,7 +38,7 @@ public class GameUiEditor : Editor
         _redStyle.normal.textColor = Color.red;
 
         GUILayout.Space(10);
-        if (GUILayout.Button("Refresh UI", GUILayout.Width(Logic.GetPercent(Screen.width, 90)), GUILayout.Height(50)))
+        if (GUILayout.Button("Refresh UI", GUILayout.Width(UiUtils.GetPercent(Screen.width, 90)), GUILayout.Height(50)))
         {
             _myScript.RefreshCameraTransform();
             _myScript.RefreshUi(true);
@@ -83,13 +83,13 @@ public class GameUiEditor : Editor
             if (AndroidViewType == AndroidViewType.Landscape &&
                 _myScript.InspectorScreenWidth > _myScript.InspectorScreenHeight && _myScript.InspectorScreenWidth > 440)
             {
-                foreach (var vs in Logic.ViewSizes)
+                foreach (var vs in EditorUtils.ViewSizes)
                 {
                     if (vs.Width == _myScript.InspectorScreenWidth && vs.Height == _myScript.InspectorScreenHeight)
                         Error = "ViewSize allready exists.";
                 }
                 if (string.IsNullOrEmpty(Error))
-                    Logic.AddCustomSize(GameViewSizeType.FixedResolution, GameViewSizeGroupType.Android,
+                    EditorUtils.AddCustomSize(GameViewSizeType.FixedResolution, GameViewSizeGroupType.Android,
                         _myScript.InspectorScreenWidth, _myScript.InspectorScreenHeight, _myScript.InspectorScreenName);
             }
         }
@@ -100,7 +100,7 @@ public class GameUiEditor : Editor
 
         GUILayout.Space(10);
 
-        foreach (var viewSize in Logic.ViewSizes)
+        foreach (var viewSize in EditorUtils.ViewSizes)
         {
             EditorGUILayout.BeginHorizontal();
 
@@ -110,7 +110,7 @@ public class GameUiEditor : Editor
 
             if (GUILayout.Button("Set VS"))
             {
-                Logic.SetSizeToScreen(GameViewSizeGroupType.Android, viewSize.Width, viewSize.Height);
+                EditorUtils.SetSizeToScreen(GameViewSizeGroupType.Android, viewSize.Width, viewSize.Height);
 
                 _myScript.InspectorScreenWidth = viewSize.Width;
                 _myScript.InspectorScreenHeight = viewSize.Height;

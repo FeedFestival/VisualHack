@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 using System.Collections.Generic;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 
 public class GameProperties : MonoBehaviour
 {
@@ -60,7 +60,7 @@ public class GameProperties : MonoBehaviour
             {
                 case ControllerType.Default:
                 case ControllerType.DefaultPacked:
-                case ControllerType.Zas:
+                //case ControllerType.Zas:
                     xPos = 5.6f;
                     break;
                 case ControllerType.Classic:
@@ -77,7 +77,7 @@ public class GameProperties : MonoBehaviour
             {
                 case ControllerType.Default:
                 case ControllerType.DefaultPacked:
-                case ControllerType.Zas:
+                //case ControllerType.Zas:
                     xPos = 5.5f;
                     break;
                 case ControllerType.Classic:
@@ -94,7 +94,7 @@ public class GameProperties : MonoBehaviour
             {
                 case ControllerType.Default:
                 case ControllerType.DefaultPacked:
-                case ControllerType.Zas:
+                //case ControllerType.Zas:
                     xPos = 5.5f;
                     break;
                 case ControllerType.Classic:

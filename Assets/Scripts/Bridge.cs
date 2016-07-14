@@ -1,11 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 
 public class Bridge : MonoBehaviour
 {
-    [SerializeField] public int Id;
+    [SerializeField]
+    public int Id;
 
     private Transform _bridgeRoadTransform;
 
@@ -29,7 +30,7 @@ public class Bridge : MonoBehaviour
             _startLerp = true;
         }
     }
-    
+
     [SerializeField]
     private List<Zone> Zones;
 
@@ -87,7 +88,7 @@ public class Bridge : MonoBehaviour
 
         MoveUpdate();
 
-        _lerpTime = _lerpTime + Logic.LerpRatio * Logic.LerpSpeed;
+        _lerpTime = _lerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_lerpTime >= 1)) return;
 

@@ -3,7 +3,7 @@ using UnityEngine;
 using System.Collections;
 using System.Configuration;
 using System.Linq;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using UnityEditor;
 
 [CustomEditor(typeof(MapGenerator))]
@@ -62,7 +62,7 @@ public class MapGeneratorEditor : Editor
         GUILayout.Label("Map Creation");
         GUILayout.Space(5);
 
-        if (GUILayout.Button("Generate Base Map", GUILayout.Width(Logic.GetPercent(Screen.width, 25)), GUILayout.Height(30)))
+        if (GUILayout.Button("Generate Base Map", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25)), GUILayout.Height(30)))
             _myScript.GenerateBaseMap(true);
 
         _myScript.NewGameObject = EditorGUILayout.ObjectField("Map :", _myScript.NewGameObject, typeof(GameObject), true) as GameObject;
@@ -88,7 +88,7 @@ public class MapGeneratorEditor : Editor
 
         //EditorGUILayout.BeginHorizontal();
 
-        //if (GUILayout.Button("Get maps", GUILayout.Width(Logic.GetPercent(Screen.width, 25)), GUILayout.Height(30)))
+        //if (GUILayout.Button("Get maps", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25)), GUILayout.Height(30)))
         //    _myScript.GetMaps();
 
         //GUILayout.FlexibleSpace();
@@ -106,7 +106,7 @@ public class MapGeneratorEditor : Editor
 
                 EditorGUILayout.BeginVertical();
 
-                GUILayout.Label("Id:" + map.Id, GUILayout.Width(Logic.GetPercent(Screen.width, 10)));
+                GUILayout.Label("Id:" + map.Id, GUILayout.Width(UiUtils.GetPercent(Screen.width, 10)));
 
                 EditorGUILayout.BeginHorizontal();
 
@@ -124,17 +124,17 @@ public class MapGeneratorEditor : Editor
 
                 EditorGUILayout.EndVertical();
 
-                GUILayout.Space(Logic.GetPercent(Screen.width, 5));
+                GUILayout.Space(UiUtils.GetPercent(Screen.width, 5));
 
                 EditorGUILayout.BeginVertical();
 
-                if (GUILayout.Button("Generate Map", GUILayout.Width(Logic.GetPercent(Screen.width, 25))))
+                if (GUILayout.Button("Generate Map", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25))))
                 {
                     _myScript.SetupCurrentMap(map.Id);
                     _myScript.CreateMap(true);
                 }
                 if (_myScript.CurrentMap != null && _myScript.CurrentMap.Id == map.Id)
-                    if (GUILayout.Button("Update ?", GUILayout.Width(Logic.GetPercent(Screen.width, 25))))
+                    if (GUILayout.Button("Update ?", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25))))
                         _myScript.MapId = map.Id;
 
                 EditorGUILayout.EndVertical();
@@ -163,7 +163,7 @@ public class MapGeneratorEditor : Editor
 
             EditorGUILayout.BeginVertical();
 
-            GUILayout.Label("Id:" + _myScript.CurrentMap.Id, GUILayout.Width(Logic.GetPercent(Screen.width, 10)));
+            GUILayout.Label("Id:" + _myScript.CurrentMap.Id, GUILayout.Width(UiUtils.GetPercent(Screen.width, 10)));
 
             EditorGUILayout.BeginHorizontal();
 
@@ -188,9 +188,9 @@ public class MapGeneratorEditor : Editor
 
             EditorGUILayout.EndVertical();
 
-            GUILayout.Space(Logic.GetPercent(Screen.width, 5));
+            GUILayout.Space(UiUtils.GetPercent(Screen.width, 5));
 
-            if (GUILayout.Button("Update Map", GUILayout.Width(Logic.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
+            if (GUILayout.Button("Update Map", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
                 _action = InspectorButton.UpdateMap;
 
             EditorGUILayout.EndHorizontal();
@@ -221,10 +221,10 @@ public class MapGeneratorEditor : Editor
 
             GUILayout.FlexibleSpace();
 
-            if (GUILayout.Button("Confirm", GUILayout.Width(Logic.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
+            if (GUILayout.Button("Confirm", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
                 ConfirmAccepted();
 
-            if (GUILayout.Button("Cancel", GUILayout.Width(Logic.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
+            if (GUILayout.Button("Cancel", GUILayout.Width(UiUtils.GetPercent(Screen.width, 25)), GUILayout.Height(50)))
                 _setupConfirm = false;
 
             GUILayout.FlexibleSpace();

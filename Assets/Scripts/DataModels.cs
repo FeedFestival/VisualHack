@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Assets.Scripts.Types;
+using Assets.Scripts.Utils;
 using SQLite4Unity3d;
 using UnityEngine;
 
