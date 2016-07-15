@@ -74,8 +74,11 @@ public class LoadingController : MonoBehaviour
     {
         if (_loadingContainer.gameObject.activeSelf) yield break;
 
-        StartFade();
+        if (_main.FacebookController.IsShowingBanner)
+            _main.FacebookController.ShowAndroidBanner(false);
 
+        StartFade();
+        
         LoadingIcon.SetActive(true);
         LoadingIconText.gameObject.SetActive(false);
 

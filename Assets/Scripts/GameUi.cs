@@ -28,7 +28,7 @@ public class GameUi : MonoBehaviour
     private Button _rightController, _leftController, _downController, _upController;
 
     private float _width, _height, _rightPoint, _leftPoint, _topPoint, _bottomPoint;
-    
+
 
     public void Initialize(Main main)
     {
@@ -58,12 +58,20 @@ public class GameUi : MonoBehaviour
         Transform[] allChildren = GetComponentsInChildren<Transform>(true);
         foreach (Transform child in allChildren)
         {
-            Image image;
             switch (child.gameObject.name)
             {
                 case "Canvas":
+                    if (fromInspector == false)
+                        _main.Canvas = child.gameObject;
                     UiUtils.SetAnchor(AnchorType.TopLeft, child.GetComponent<RectTransform>());
                     UiUtils.SetSize(LayoutType.Full, child.GetComponent<RectTransform>());
+                    break;
+
+                case "AdBanner":
+                    if (fromInspector == false)
+                        _main.AdBanner = child.gameObject;
+                    UiUtils.SetFixedSize(UiUtils.XPercent(100), 50, child.GetComponent<RectTransform>());
+                    UiUtils.SetPosition(50, 500, child.GetComponent<RectTransform>());
                     break;
 
                 //---------------------------------------------------------------------------------
@@ -91,13 +99,50 @@ public class GameUi : MonoBehaviour
                     break;
 
                 //---------------------------------------------------------------------------------
+                case "DebugButton":
+                    if (fromInspector == false)
+                        _main.DebugButton = child.gameObject;
+                    UiUtils.SetSize(5, LayoutType.Square, child.gameObject.GetComponent<RectTransform>());
+                    UiUtils.SetPosition(5, 30, child.gameObject.GetComponent<RectTransform>());
+                    break;
+
+                case "DebugButtonText":
+                    UiUtils.SetIconSize(child.GetComponent<Text>());
+                    break;
+                    
+                case "_DebugPanel":
+                    UiUtils.SetAnchor(AnchorType.TopLeft, child.GetComponent<RectTransform>());
+                    UiUtils.SetSize(LayoutType.Full, child.GetComponent<RectTransform>());
+                    break;
+
                 case "DebugContainer":
                     DebugContainer = child.gameObject;
+
+                    UiUtils.SetSize(LayoutType.Full, child.GetComponent<RectTransform>());
+                    UiUtils.SetPosition(0, 0, child.gameObject.GetComponent<RectTransform>());
+
+                    DebugContainer.transform.parent.gameObject.SetActive(false);
                     break;
 
                 case "DebugText":
                     if (fromInspector == false)
-                        _main.DebugTextGameObject = child.GetComponent<InputField>();
+                        _main.DebugTextGameObject = child.GetComponent<Text>();
+
+                    UiUtils.SetSize(98, 98, child.GetComponent<RectTransform>());
+                    UiUtils.SetPosition(2, 2, child.gameObject.GetComponent<RectTransform>());
+                    
+                    break;
+
+                case "DebugScrollImage":
+
+                    UiUtils.SetSize(95, 80, child.GetComponent<RectTransform>());
+                    UiUtils.SetPosition(3, 18, child.gameObject.GetComponent<RectTransform>());
+                    break;
+
+                case "DebugBackButton":
+                    UiUtils.SetAnchor(AnchorType.LeftCenter, child.GetComponent<Button>());
+                    UiUtils.SetSize(27, 15, child.GetComponent<Button>());
+                    UiUtils.SetPosition(15, 10, child.GetComponent<Button>());
                     break;
 
                 //---------------------------------------------------------------------------------
@@ -150,7 +195,11 @@ public class GameUi : MonoBehaviour
                 case "SettingsBackButton":
                     UiUtils.SetAnchor(AnchorType.LeftCenter, child.GetComponent<Button>());
                     UiUtils.SetSize(27, 15, child.GetComponent<Button>());
-                    UiUtils.SetPosition(14, 80, child.GetComponent<Button>());
+
+                    UiUtils.SetPosition(14, 75, child.GetComponent<Button>());
+                    //UiUtils.SetFixedPosition(UiUtils.GetPercent(child.parent.GetComponent<RectTransform>().sizeDelta.x, 14),
+                    //    (_height - child.GetComponent<RectTransform>().sizeDelta.y) - 125,
+                    //    child.GetComponent<RectTransform>());
                     break;
 
                 //---------------------------------------------------------------------------------
@@ -164,7 +213,11 @@ public class GameUi : MonoBehaviour
                 case "MapsBackButton":
                     UiUtils.SetAnchor(AnchorType.LeftCenter, child.GetComponent<Button>());
                     UiUtils.SetSize(27, 15, child.GetComponent<Button>());
-                    UiUtils.SetPosition(14, 80, child.GetComponent<Button>());
+
+                    UiUtils.SetPosition(14, 75, child.GetComponent<Button>());
+                    //UiUtils.SetFixedPosition(UiUtils.GetPercent(child.parent.GetComponent<RectTransform>().sizeDelta.x, 14),
+                    //    (_height - child.GetComponent<RectTransform>().sizeDelta.y) - 125,
+                    //    child.GetComponent<RectTransform>());
                     break;
 
                 //---------------------------------------------------------------------------------
@@ -374,7 +427,7 @@ public class GameUi : MonoBehaviour
             xPos = xPos + 21;
 
             i++;
-            if (i%5 != 0) continue;
+            if (i % 5 != 0) continue;
 
             xPos = 8;
             yPos = yPos + 26;
@@ -449,52 +502,52 @@ public class GameUi : MonoBehaviour
     {
         // Right
         EventTrigger trigger = _rightController.gameObject.GetComponent<EventTrigger>();
-        EventTrigger.Entry entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
+        EventTrigger.Entry entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Right); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Right); });
 
         trigger.triggers.Add(entry);
 
         // Down
         trigger = _downController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Down); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Down); });
 
         trigger.triggers.Add(entry);
 
         // Left
         trigger = _leftController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Left); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Left); });
 
         trigger.triggers.Add(entry);
 
         // Up
         trigger = _upController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Up); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
+        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Up); });
 
         trigger.triggers.Add(entry);

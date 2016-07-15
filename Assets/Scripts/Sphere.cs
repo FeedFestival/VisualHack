@@ -165,8 +165,10 @@ public class Sphere : MonoBehaviour
         if (!(_scaleLerpTime >= 1)) return;
 
         _scaleLerpTime = 0;
-        
-        Main.InitGame(Win ? Main.GetNextMapId() : 0);
+
+        Main.FacebookController.LoadInterstitial();
+
+        //Main.InitGame(Win ? Main.GetNextMapId() : 0);
 
         FallInPit = false;
     }

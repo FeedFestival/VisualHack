@@ -1,7 +1,7 @@
 ﻿using System;
-using UnityEngine;
 using System.Linq;
 using Assets.Scripts.Utils;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class Main : MonoBehaviour
@@ -13,7 +13,7 @@ public class Main : MonoBehaviour
     [HideInInspector]
     public LoadingController LoadingController;
 
-    private FacebookController _facebookController;
+    public FacebookController FacebookController;
 
     private User _loggedUser;
 
@@ -37,19 +37,27 @@ public class Main : MonoBehaviour
     }
 
     [HideInInspector]
-    public InputField DebugTextGameObject;
+    public GameObject DebugButton;
+
+    [HideInInspector]
+    public Text DebugTextGameObject;
     private string _debugText;
     public string DebugText
     {
         get { return _debugText; }
         set
         {
-            _debugText = value + Environment.NewLine + _debugText;
-            if (_gameUi.DebugContainer.transform.parent.gameObject.activeSelf == false)
-                _gameUi.DebugContainer.transform.parent.gameObject.SetActive(true);
+            var time = "[" + DateTime.Now.Hour + ":" + DateTime.Now.Minute + " ." + DateTime.Now.Second + "]";
+
+            _debugText = time + value + Environment.NewLine + _debugText;
+
             DebugTextGameObject.text = _debugText;
         }
     }
+
+    public GameObject AdBanner;
+
+    public GameObject Canvas;
 
     public void ClearDebugLog()
     {
@@ -78,7 +86,8 @@ public class Main : MonoBehaviour
         /*
          * Facebook
          */
-        _facebookController = GetComponent<FacebookController>();
+        FacebookController = GetComponent<FacebookController>();
+        FacebookController.Initialize(this);
 
         _loggedUser = DataService.GetUser();
         FacebookInitializationComplete();
@@ -122,7 +131,7 @@ public class Main : MonoBehaviour
             if (_loggedUser.FacebookId > 0 && user == null)
                 SetProfilePicture();
             else if (user != null)
-                _facebookController.GetProfilePicture();
+                FacebookController.GetProfilePicture();
 
             Login();
         }
@@ -170,6 +179,7 @@ public class Main : MonoBehaviour
             Utils.SavePic(texture, texture.width, texture.height, picName);
 
         texture = Utils.ReadPic(picName);
+        DebugText = picName;
 
         _gameUi.ProfilePicture.sprite = Sprite.Create(texture, new Rect(0, 0, 128, 128), new Vector2());
     }
@@ -208,6 +218,8 @@ public class Main : MonoBehaviour
                 _gameUi.MapsPanel.SetActive(false);
 
                 _gameUi.SettingsPanel.SetActive(true);
+                if (FacebookController.IsShowingBanner == false)
+                    FacebookController.ShowAndroidBanner(true);
                 break;
 
             case ButtonClick.RedBallButton:
@@ -222,6 +234,8 @@ public class Main : MonoBehaviour
                 }
 
                 _gameUi.MapsPanel.SetActive(true);
+                if (FacebookController.IsShowingBanner == false)
+                    FacebookController.ShowAndroidBanner(true);
                 break;
 
             case ButtonClick.SettingsBackButton:
@@ -232,6 +246,8 @@ public class Main : MonoBehaviour
 
             case ButtonClick.MapsBackButton:
                 _gameUi.MapsPanel.SetActive(false);
+
+                FacebookController.ShowAndroidBanner(true);
 
                 ShowMainMenu();
                 break;
@@ -248,7 +264,7 @@ public class Main : MonoBehaviour
 
             case ButtonClick.LoginButton:
 
-                _facebookController.Initialize(this);
+                FacebookController.Login();
 
                 break;
 
@@ -274,6 +290,9 @@ public class Main : MonoBehaviour
         _gameUi.MapsPanel.SetActive(false);
         _gameUi.TopBarPanel.SetActive(false);
 
+        if (FacebookController.IsShowingBanner)
+            FacebookController.ShowAndroidBanner(false);
+
         GameProperties.SetupCamera();
         _gameUi.SetupController();
 
@@ -295,6 +314,9 @@ public class Main : MonoBehaviour
 
         _gameUi.MainMenuPanel.SetActive(true);
         _gameUi.TopBarPanel.SetActive(true);
+
+        if (FacebookController.IsShowingBanner == false)
+            FacebookController.ShowAndroidBanner(true);
     }
 
     public void SelectControllerType(int controllerType)
@@ -309,5 +331,24 @@ public class Main : MonoBehaviour
         DataService.UpdateUser(user);
 
         ButtonClicked((int)ButtonClick.SettingsBackButton);
+    }
+
+    public void ShowDebugLog(bool value)
+    {
+        _gameUi.DebugContainer.transform.parent.gameObject.SetActive(value);
+        DebugButton.SetActive(!value);
+
+        if (value)
+        {
+            _gameUi.StartPanel.SetActive(false);
+            _gameUi.MainMenuPanel.SetActive(false);
+            _gameUi.TopBarPanel.SetActive(false);
+            _gameUi.SettingsPanel.SetActive(false);
+            _gameUi.MapsPanel.SetActive(false);
+            _gameUi.GameViewPanel.SetActive(false);
+
+            return;
+        }
+        ShowMainMenu();
     }
 }
