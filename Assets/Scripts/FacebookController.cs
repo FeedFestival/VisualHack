@@ -1,8 +1,7 @@
-﻿using System;
-using UnityEngine;
-using System.Collections;
+﻿using UnityEngine;
 using System.Collections.Generic;
 using Facebook.Unity;
+//using AudienceNetwork;
 
 public class FacebookController : MonoBehaviour
 {

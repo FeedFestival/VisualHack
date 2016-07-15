@@ -158,7 +158,7 @@ public class GameUiEditor : Editor
             return;
 
         if (AndroidViewType == AndroidViewType.Landscape &&
-            xSize > ySize && xSize > 440)
+            xSize > ySize && xSize > 280)
         {
             foreach (var vs in EditorUtils.ViewSizes)
             {

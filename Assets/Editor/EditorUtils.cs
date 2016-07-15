@@ -94,7 +94,7 @@ namespace Assets.Scripts.Utils
                 int sizeWidth = (int)widthProp.GetValue(size, null);
                 int sizeHeight = (int)heightProp.GetValue(size, null);
 
-                if (AndroidViewType == AndroidViewType.Landscape && sizeWidth > sizeHeight && sizeWidth > 440)
+                if (AndroidViewType == AndroidViewType.Landscape && sizeWidth > sizeHeight && sizeWidth > 280)
                     viewSizes.Add(new ViewSize
                     {
                         Name = displayTexts[i],

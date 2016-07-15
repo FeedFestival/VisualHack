@@ -206,21 +206,17 @@ namespace Assets.Scripts.Utils
             var ratio = GetValuePercent(textHeight, parentHeight);
             text.fontSize = (int)GetPercent(textHeight, ratio);
         }
-
-
-
+        
         public static float GCD(float x, float y)
         {
-            return y == 0 ? x : GCD(y, x % y);
+            return Math.Abs(y) < 1 ? x : GCD(y, x % y);
         }
 
         public static AspectRatio GetAspectRatio()
         {
             var x = ScreenWidth / GCD(ScreenWidth, ScreenHeight);
             var y = ScreenHeight / GCD(ScreenWidth, ScreenHeight);
-
-            Debug.Log(x + ":" + y);
-
+            
             if ((Math.Abs(x - 16) < 0.1f && Math.Abs(y - 9) < 0.1f) ||
                 (Math.Abs(x - 427) < 2 && Math.Abs(y - 240) < 2) ||
                 (Math.Abs(x - 80) < 2 && Math.Abs(y - 39) < 2) ||  //  480	× 234
