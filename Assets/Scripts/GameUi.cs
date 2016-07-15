@@ -28,6 +28,7 @@ public class GameUi : MonoBehaviour
     private Button _rightController, _leftController, _downController, _upController;
 
     private float _width, _height, _rightPoint, _leftPoint, _topPoint, _bottomPoint;
+    
 
     public void Initialize(Main main)
     {
@@ -84,6 +85,7 @@ public class GameUi : MonoBehaviour
 
                 case "LoadingIconCircle":
                     child.GetComponent<Text>().text = UiUtils.circle;
+                    UiUtils.SetIconSize(child.GetComponent<Text>());
                     if (fromInspector == false)
                         _main.LoadingController.LoadingIconCircle = child.GetComponent<Text>();
                     break;
@@ -107,13 +109,13 @@ public class GameUi : MonoBehaviour
 
                 case "PlayOfflineButton":
                     UiUtils.SetAnchor(AnchorType.LeftCenter, child.GetComponent<RectTransform>());
-                    UiUtils.SetSize(27, 12, child.GetComponent<RectTransform>());
+                    UiUtils.SetSize(27, 12, child.GetComponent<Button>());
                     UiUtils.SetPosition(30, 50, child.GetComponent<RectTransform>());
                     break;
 
                 case "LoginButton":
                     UiUtils.SetAnchor(AnchorType.LeftCenter, child.GetComponent<RectTransform>());
-                    UiUtils.SetSize(27, 12, child.GetComponent<RectTransform>());
+                    UiUtils.SetSize(27, 12, child.GetComponent<Button>());
                     UiUtils.SetPosition(70, 50, child.GetComponent<RectTransform>());
                     break;
 
@@ -193,14 +195,15 @@ public class GameUi : MonoBehaviour
                     break;
 
                 case "ProfileName":
-                    ProfileName = child.gameObject.GetComponent<Text>();
+                    ProfileName = child.GetComponent<Text>();
                     UiUtils.SetSize(30, 60, ProfileName.GetComponent<RectTransform>());
                     UiUtils.SetPosition(10, 20, ProfileName.GetComponent<RectTransform>());
+                    UiUtils.SetTextSize(child.GetComponent<Text>());
                     break;
 
                 case "SettingsButton":
                     UiUtils.SetAnchor(AnchorType.TopRight, child.gameObject.GetComponent<RectTransform>());
-                    UiUtils.SetSize(10, 60, child.gameObject.GetComponent<RectTransform>());
+                    UiUtils.SetSize(10, 60, child.gameObject.GetComponent<Button>());
                     UiUtils.SetPosition(98, 20, child.gameObject.GetComponent<RectTransform>());
                     break;
 
@@ -211,37 +214,56 @@ public class GameUi : MonoBehaviour
                 //---------------------------------------------------------------------------------
                 case "GameViewPanel":
                     GameViewPanel = child.gameObject;
+                    UiUtils.SetAnchor(AnchorType.TopLeft, child.gameObject.GetComponent<RectTransform>());
+                    UiUtils.SetSize(LayoutType.Full, child.GetComponent<RectTransform>());
+
                     break;
 
                 case "GameSettingsButton":
-                    image = child.gameObject.GetComponent<Image>();
-                    image.rectTransform.localPosition = new Vector3(_rightPoint - UiUtils.GetPercent(_width, 6), _bottomPoint - (-UiUtils.GetPercent(_height, 90)), 0f);
+                    UiUtils.SetAnchor(AnchorType.TopRight, child.gameObject.GetComponent<RectTransform>());
+
+                    UiUtils.SetFixedSize(UiUtils.XPercent(10),
+                        UiUtils.GetPercent(TopBarPanel.GetComponent<RectTransform>().sizeDelta.y, 60),
+                        child.gameObject.GetComponent<RectTransform>());
+
+                    UiUtils.SetFixedPosition(UiUtils.XPercent(98),
+                        UiUtils.GetPercent(TopBarPanel.GetComponent<RectTransform>().sizeDelta.y, 20),
+                        child.gameObject.GetComponent<RectTransform>());
+                    break;
+
+                case "GameSettingsButtonText":
+                    UiUtils.SetIconSize(child.GetComponent<Text>());
                     break;
 
                 case "ReloadButton":
-                    image = child.gameObject.GetComponent<Image>();
-                    image.rectTransform.localPosition = new Vector3(_rightPoint - UiUtils.GetPercent(_width, 6), _bottomPoint - (-UiUtils.GetPercent(_height, 70)), 0f);
+                    UiUtils.SetAnchor(AnchorType.TopRight, child.gameObject.GetComponent<RectTransform>());
+                    UiUtils.SetFixedSize(UiUtils.XPercent(10),
+                        UiUtils.GetPercent(TopBarPanel.GetComponent<RectTransform>().sizeDelta.y, 60),
+                        child.gameObject.GetComponent<RectTransform>());
+                    UiUtils.SetFixedPosition(UiUtils.XPercent(98),
+                        UiUtils.GetPercent(TopBarPanel.GetComponent<RectTransform>().sizeDelta.y, 100),
+                        child.gameObject.GetComponent<RectTransform>());
+                    break;
+
+                case "ReloadButtonText":
+                    UiUtils.SetIconSize(child.GetComponent<Text>());
                     break;
 
                 case "RightController":
-                    _rightController = child.gameObject.GetComponent<Button>();
-                    _rightController.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(UiUtils.GetPercent(_width, 10.30444f), UiUtils.GetPercent(_height, 18.33333f));
-
+                    _rightController = child.GetComponent<Button>();
+                    UiUtils.SetSize(LayoutType.Square, 18.33333f, child.GetComponent<RectTransform>());
                     break;
                 case "LeftController":
-                    _leftController = child.gameObject.GetComponent<Button>();
-                    _leftController.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(UiUtils.GetPercent(_width, 10.30444f), UiUtils.GetPercent(_height, 18.33333f));
-
+                    _leftController = child.GetComponent<Button>();
+                    UiUtils.SetSize(LayoutType.Square, 18.33333f, child.GetComponent<RectTransform>());
                     break;
                 case "UpController":
-                    _upController = child.gameObject.GetComponent<Button>();
-                    _upController.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(UiUtils.GetPercent(_width, 10.30444f), UiUtils.GetPercent(_height, 18.33333f));
-
+                    _upController = child.GetComponent<Button>();
+                    UiUtils.SetSize(LayoutType.Square, 18.33333f, child.GetComponent<RectTransform>());
                     break;
                 case "DownController":
-                    _downController = child.gameObject.GetComponent<Button>();
-                    _downController.gameObject.GetComponent<Image>().rectTransform.sizeDelta = new Vector2(UiUtils.GetPercent(_width, 10.30444f), UiUtils.GetPercent(_height, 18.33333f));
-
+                    _downController = child.GetComponent<Button>();
+                    UiUtils.SetSize(LayoutType.Square, 18.33333f, child.GetComponent<RectTransform>());
                     break;
             }
 
@@ -255,6 +277,8 @@ public class GameUi : MonoBehaviour
 
         if (fromInspector)
         {
+            SetupController(true);
+
             int i;
             allChildren = MapsPanel.GetComponentsInChildren<Transform>();
             List<Transform> children = allChildren.ToList();
@@ -285,49 +309,44 @@ public class GameUi : MonoBehaviour
     public int InspectorScreenWidth;
     public int InspectorScreenHeight;
     public string InspectorScreenName;
+    public ControllerType InspectorControllerType;
     public void RefreshCameraTransform()
     {
         _width = InspectorScreenWidth;
         _height = InspectorScreenHeight;
 
         var orthographicSize = 4.77f;
-        if (Math.Abs(_width - 480) < 5)
-        {
-            orthographicSize = 5.5f;
-        }
-        else if (Math.Abs(_width - 854) < 5)
-        {
-            orthographicSize = 4.7f;
-        }
-        else if (Math.Abs(_width - 800) < 5)
-        {
-            orthographicSize = 5;
-        }
-        else if (Math.Abs(_width - 1024) < 5)
-        {
-            orthographicSize = 4.8f;
-        }
-        GetComponent<Camera>().orthographicSize = orthographicSize;
-
         var xPos = 5.5f;
-        var yPos = 4.07f;
+        var yPos = 3.98f;
 
-        if (Math.Abs(_width - 480) < 5)
+        switch (UiUtils.GetAspectRatio())
         {
+            case AspectRatio.Unregistered:
+                break;
+            case AspectRatio.Aspect_16_9:
 
-        }
-        else if (Math.Abs(_width - 854) < 5)
-        {
-            yPos = 3.98f;
-            xPos = 7.6f;
-        }
-        else if (Math.Abs(_width - 800) < 5)
-        {
-            xPos = 7.6f;
-        }
-        else if (Math.Abs(_width - 1024) < 5)
-        {
-            xPos = 7.6f;
+                GetComponent<Camera>().orthographicSize = orthographicSize;
+
+                switch (InspectorControllerType)
+                {
+                    case ControllerType.DefaultPacked:
+                    case ControllerType.Default:
+                    case ControllerType.Zas:
+                        break;
+                    case ControllerType.ClassicPacked:
+                        xPos = 7f;
+                        break;
+                    case ControllerType.Classic:
+                        xPos = 7.6f;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
         transform.position = new Vector3(xPos, yPos, -25);
     }
@@ -355,7 +374,7 @@ public class GameUi : MonoBehaviour
             xPos = xPos + 21;
 
             i++;
-            if (i % 5 != 0) continue;
+            if (i%5 != 0) continue;
 
             xPos = 8;
             yPos = yPos + 26;
@@ -384,111 +403,42 @@ public class GameUi : MonoBehaviour
 
     private UnityAction OpenMap(int mapId)
     {
-        return () =>
-        {
-            _main.InitGame(mapId);
-        };
+        return () => { _main.InitGame(mapId); };
     }
 
-    public void SetupController()
+    private const float BottomSpace = 81.25f;
+    private const float LeftSpace = 2.22f;
+    private const float RightSpace = 100 - 2.22f;
+
+    public void SetupController(bool isFromInspector = false)
     {
-        Image image;
-        switch (_main.GameProperties.ControllerType)
+        switch (isFromInspector ? InspectorControllerType : _main.GameProperties.ControllerType)
         {
             case ControllerType.DefaultPacked:
-                image = _rightController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint, 0f);
+                UiUtils.SetPosition(100, 100, _rightController);
+                UiUtils.SetPosition(RightSpace, BottomSpace, _upController);
 
-                image = _downController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(
-                    _leftPoint + UiUtils.GetPercent(_width, 2.22f), _bottomPoint, 0f);
-
-                image = _leftController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_leftPoint,
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f);
-
-                image = _upController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 2.22f),
-                        _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f);
-
+                UiUtils.SetPosition(LeftSpace, 100, _downController);
+                UiUtils.SetPosition(0, BottomSpace, _leftController);
                 break;
             case ControllerType.Default:
-                image = _rightController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_rightPoint,
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 18.1f)), 0f);
+                UiUtils.SetPosition(100, BottomSpace, _rightController);
+                UiUtils.SetPosition(RightSpace, 100 - 37.375f, _upController);
 
-                image = _downController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(
-                    _leftPoint + UiUtils.GetPercent(_width, 2.22f), _bottomPoint, 0f);
-
-                image = _leftController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_leftPoint,
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f);
-
-                image = _upController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 2.22f),
-                        _bottomPoint - (-UiUtils.GetPercent(_height, 36.5f)), 0f);
-
+                UiUtils.SetPosition(LeftSpace, 100, _downController);
+                UiUtils.SetPosition(0, BottomSpace, _leftController);
                 break;
-            //case ControllerType.Zas:
-            //    image = _rightController.gameObject.GetComponent<Image>();
-            //    image.rectTransform.localPosition = new Vector3(_rightPoint, _bottomPoint, 0f);
-
-            //    image = _downController.gameObject.GetComponent<Image>();
-            //    image.rectTransform.localPosition = new Vector3(
-            //        _leftPoint + UiUtils.GetPercent(_width, 2.22f),
-            //        _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f);
-
-            //    image = _leftController.gameObject.GetComponent<Image>();
-            //    image.rectTransform.localPosition = new Vector3(_leftPoint, _bottomPoint, 0f);
-
-            //    image = _upController.gameObject.GetComponent<Image>();
-            //    image.rectTransform.localPosition =
-            //        new Vector3(_rightPoint - UiUtils.GetPercent(_width, 2.22f),
-            //            _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f);
-
-            //    break;
             case ControllerType.ClassicPacked:
-                image = _rightController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_rightPoint,
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 12.5f)), 0f);
-
-                image = _downController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 18.73f), _bottomPoint, 0f); // 267
-
-                image = _leftController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(
-                    _rightPoint - UiUtils.GetPercent(_width, 21f),
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 18.75f)), 0f); // 248
-
-                image = _upController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 2.22f),
-                        _bottomPoint - (-UiUtils.GetPercent(_height, 31.2f)), 0f);
-
+                UiUtils.SetPosition(100, 100 - 12.5f, _rightController);
+                UiUtils.SetPosition(BottomSpace, 100, _downController);
+                UiUtils.SetPosition(100 - 21f, BottomSpace, _leftController);
+                UiUtils.SetPosition(RightSpace, 100 - 31.2f, _upController);
                 break;
             case ControllerType.Classic:
-                image = _rightController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition = new Vector3(_rightPoint,
-                    _bottomPoint - (-UiUtils.GetPercent(_height, 15.6f)), 0f);
-
-                image = _downController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 18.06f), _bottomPoint, 0f); // 277
-
-                image = _leftController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 25.82f),
-                        _bottomPoint - (-UiUtils.GetPercent(_height, 15.6f)), 0f); // 215
-
-                image = _upController.gameObject.GetComponent<Image>();
-                image.rectTransform.localPosition =
-                    new Vector3(_rightPoint - UiUtils.GetPercent(_width, 7.75f),
-                        _bottomPoint - (-UiUtils.GetPercent(_height, 33.33f)), 0f);
-
+                UiUtils.SetPosition(100, 100 - 14f, _rightController);
+                UiUtils.SetPosition(100 - 18.1f, 100, _downController);
+                UiUtils.SetPosition(100 - 26f, 100 - 14f, _leftController);
+                UiUtils.SetPosition(100 - 7.75f, 100 - 31.2f, _upController);
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -499,52 +449,52 @@ public class GameUi : MonoBehaviour
     {
         // Right
         EventTrigger trigger = _rightController.gameObject.GetComponent<EventTrigger>();
-        EventTrigger.Entry entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+        EventTrigger.Entry entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Right); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Right); });
 
         trigger.triggers.Add(entry);
 
         // Down
         trigger = _downController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Down); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Down); });
 
         trigger.triggers.Add(entry);
 
         // Left
         trigger = _leftController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Left); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Left); });
 
         trigger.triggers.Add(entry);
 
         // Up
         trigger = _upController.gameObject.GetComponent<EventTrigger>();
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerDown };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerDown};
         entry.callback.AddListener((eventData) => { sphere.MoveDirection(Move.Up); });
 
         trigger.triggers.Clear();
         trigger.triggers.Add(entry);
 
-        entry = new EventTrigger.Entry { eventID = EventTriggerType.PointerUp };
+        entry = new EventTrigger.Entry {eventID = EventTriggerType.PointerUp};
         entry.callback.AddListener((eventData) => { sphere.StopDirection(Move.Up); });
 
         trigger.triggers.Add(entry);

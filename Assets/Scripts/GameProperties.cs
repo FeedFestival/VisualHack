@@ -46,65 +46,39 @@ public class GameProperties : MonoBehaviour
 
     public void SetupCamera()
     {
+        var orthographicSize = 4.77f;
         var xPos = 5.5f;
-        var yPos = 4.07f;
+        var yPos = 3.98f;
 
-        if (Math.Abs(Width - 480) < 5)
+        switch (UiUtils.GetAspectRatio())
         {
+            case AspectRatio.Unregistered:
+                break;
+            case AspectRatio.Aspect_16_9:
 
+                GetComponent<Camera>().orthographicSize = orthographicSize;
+
+                switch (ControllerType)
+                {
+                    case ControllerType.DefaultPacked:
+                    case ControllerType.Default:
+                    case ControllerType.Zas:
+                        break;
+                    case ControllerType.ClassicPacked:
+                        xPos = 7f;
+                        break;
+                    case ControllerType.Classic:
+                        xPos = 7.6f;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+
+                break;
+
+            default:
+                throw new ArgumentOutOfRangeException();
         }
-        else if (Math.Abs(Width - 854) < 5)
-        {
-            yPos = 3.98f;
-            switch (ControllerType)
-            {
-                case ControllerType.Default:
-                case ControllerType.DefaultPacked:
-                //case ControllerType.Zas:
-                    xPos = 5.6f;
-                    break;
-                case ControllerType.Classic:
-                    xPos = 7.6f;
-                    break;
-                default:
-                    xPos = 7f;
-                    break;
-            }
-        }
-        else if (Math.Abs(Width - 800) < 5)
-        {
-            switch (ControllerType)
-            {
-                case ControllerType.Default:
-                case ControllerType.DefaultPacked:
-                //case ControllerType.Zas:
-                    xPos = 5.5f;
-                    break;
-                case ControllerType.Classic:
-                    xPos = 7.6f;
-                    break;
-                default:
-                    xPos = 7f;
-                    break;
-            }
-        }
-        else if (Math.Abs(Width - 1024) < 5)
-        {
-            switch (ControllerType)
-            {
-                case ControllerType.Default:
-                case ControllerType.DefaultPacked:
-                //case ControllerType.Zas:
-                    xPos = 5.5f;
-                    break;
-                case ControllerType.Classic:
-                    xPos = 7.6f;
-                    break;
-                default:
-                    xPos = 7f;
-                    break;
-            }
-        }
-        _cameraTransform.position = new Vector3(xPos, yPos, -25);
+        transform.position = new Vector3(xPos, yPos, -25);
     }
 }

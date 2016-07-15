@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace Assets.Scripts.Utils
@@ -14,6 +15,12 @@ namespace Assets.Scripts.Utils
     {
         Square,
         Full
+    }
+
+    public enum AspectRatio
+    {
+        Unregistered,
+        Aspect_16_9
     }
 
     public static class UiUtils
@@ -33,6 +40,11 @@ namespace Assets.Scripts.Utils
             return (value / 100f) * percent;
         }
 
+        public static float GetValuePercent(float value, float maxValue)
+        {
+            return (value * 100f) / maxValue;
+        }
+
         public static float XPercent(float percent)
         {
             return (ScreenWidth / 100f) * percent;
@@ -45,6 +57,12 @@ namespace Assets.Scripts.Utils
         public static void SetSize(float x, float y, Button button)
         {
             SetSize(x, y, button.GetComponent<RectTransform>());
+            for (int i = 0; i < button.transform.childCount; i++)
+            {
+                var text = button.transform.GetChild(i).GetComponent<Text>();
+                if (text != null)
+                    SetTextSize(text, 45);
+            }
         }
 
         public static void SetSize(float x, float y, Image image)
@@ -92,6 +110,11 @@ namespace Assets.Scripts.Utils
             rt.sizeDelta = new Vector3(w, h);
         }
 
+        public static void SetFixedSize(float x, float y, RectTransform rt)
+        {
+            rt.GetComponent<RectTransform>().sizeDelta = new Vector3(x, y);
+        }
+
         public static void SetPosition(float x, float y, Button button)
         {
             SetPosition(x, y, button.GetComponent<RectTransform>());
@@ -110,6 +133,11 @@ namespace Assets.Scripts.Utils
             var h = GetPercent(parent.sizeDelta.y, y);
 
             rt.GetComponent<RectTransform>().localPosition = new Vector3(w, -h, 0f);
+        }
+
+        public static void SetFixedPosition(float x, float y, RectTransform rt)
+        {
+            rt.GetComponent<RectTransform>().localPosition = new Vector3(x, -y, 0f);
         }
 
         public static void SetAnchor(AnchorType at, RectTransform rt)
@@ -156,6 +184,58 @@ namespace Assets.Scripts.Utils
         public static void SetIconSize(Text text)
         {
             var parent = text.transform.parent.GetComponent<RectTransform>();
+
+            text.fontSize = (int)parent.sizeDelta.y;
+        }
+
+        public static void SetTextSize(Text text, float predefinedValue = 0)
+        {
+            var parentHeight = text.transform.parent.GetComponent<RectTransform>().sizeDelta.y;
+            var textHeight = text.transform.GetComponent<RectTransform>().sizeDelta.y;
+
+            if (predefinedValue > 1)
+            {
+                text.fontSize = (int)GetPercent(parentHeight, predefinedValue);
+                return;
+            }
+            else if (Math.Abs(textHeight) < 1)
+            {
+                text.fontSize = (int)GetPercent(parentHeight, 99);
+                return;
+            }
+            var ratio = GetValuePercent(textHeight, parentHeight);
+            text.fontSize = (int)GetPercent(textHeight, ratio);
+        }
+
+
+
+        public static float GCD(float x, float y)
+        {
+            return y == 0 ? x : GCD(y, x % y);
+        }
+
+        public static AspectRatio GetAspectRatio()
+        {
+            var x = ScreenWidth / GCD(ScreenWidth, ScreenHeight);
+            var y = ScreenHeight / GCD(ScreenWidth, ScreenHeight);
+
+            Debug.Log(x + ":" + y);
+
+            if ((Math.Abs(x - 16) < 0.1f && Math.Abs(y - 9) < 0.1f) ||
+                (Math.Abs(x - 427) < 2 && Math.Abs(y - 240) < 2) ||
+                (Math.Abs(x - 80) < 2 && Math.Abs(y - 39) < 2) ||  //  480	× 234
+                (Math.Abs(x - 30) < 2 && Math.Abs(y - 17) < 2) ||  //  480	×	272
+                (Math.Abs(x - 53) < 2 && Math.Abs(y - 30) < 2) ||
+                (Math.Abs(x - 128) < 2 && Math.Abs(y - 75) < 2) ||
+                (Math.Abs(x - 71) < 2 && Math.Abs(y - 40) < 2) ||
+                (Math.Abs(x - 667) < 2 && Math.Abs(y - 375) < 2) ||
+                (Math.Abs(x - 683) < 2 && Math.Abs(y - 384) < 2) ||
+                (Math.Abs(x - 222) < 2 && Math.Abs(y - 125) < 2))
+            {
+                return AspectRatio.Aspect_16_9;
+            }
+
+            return AspectRatio.Unregistered;
         }
     }
 }
