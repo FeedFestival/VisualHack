@@ -31,7 +31,7 @@ public class MapGenerator : MonoBehaviour
     }
 
     // Inspector - END
-    
+
     public Map CurrentMap;
 
     private Transform _mapMiscT;
@@ -106,7 +106,7 @@ public class MapGenerator : MonoBehaviour
             switch (child.tag)
             {
                 case "Misc":
-                    mapTile = new MapTile().GetMapTyle(child, TileType.Misc);                    
+                    mapTile = new MapTile().GetMapTyle(child, TileType.Misc);
                     if (mapTile == null) break;
 
                     HasError(mapTile.Error);
@@ -178,7 +178,7 @@ public class MapGenerator : MonoBehaviour
     private void HasError(string error)
     {
         if (string.IsNullOrEmpty(error)) return;
-        
+
         _hasError = true;
         Debug.LogError(error);
     }
@@ -247,7 +247,7 @@ public class MapGenerator : MonoBehaviour
     public void CreateMap(bool inEditor = false)
     {
         IEnumerable<MapTile> tiles;
-        
+
         if (inEditor)
         {
             MapId = 0;
@@ -256,10 +256,11 @@ public class MapGenerator : MonoBehaviour
             _main = Camera.main.gameObject.GetComponent<Main>();
         }
 
-        Destroy(CurrentMap.GameObject);
+        if (CurrentMap != null && CurrentMap.GameObject != null)
+            Destroy(CurrentMap.GameObject);
 
         tiles = _dataService.GetTiles(CurrentMap.Id);
-        
+
         GenerateBaseMap();
 
         if (tiles == null || !tiles.Any()) return;
@@ -276,7 +277,7 @@ public class MapGenerator : MonoBehaviour
                         CreateMisc(tile, _hillMiscT, true);
                     else
                         CreateMisc(tile, _mapMiscT);
-                    
+
                     break;
 
                 case TileType.DeathZone:
@@ -408,7 +409,7 @@ public class MapGenerator : MonoBehaviour
                 objT.transform.SetParent(CurrentMap.GameObject.transform);
                 objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
                 break;
-            
+
             default:
                 throw new ArgumentOutOfRangeException();
         }

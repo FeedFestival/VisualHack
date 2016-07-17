@@ -32,7 +32,8 @@ public class Main : MonoBehaviour
             _sphere = value;
             Sphere.Initialize(this);
 
-            _gameUi.SetupControllerButtons(Sphere);
+            if (_gameUi != null)
+                _gameUi.SetupControllerButtons(Sphere);
         }
     }
 
