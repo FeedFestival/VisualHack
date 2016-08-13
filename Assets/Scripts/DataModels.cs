@@ -2,6 +2,8 @@
 using Assets.Scripts.Utils;
 using SQLite4Unity3d;
 using UnityEngine;
+using System.Collections;
+using System;
 
 //public class Person
 //{

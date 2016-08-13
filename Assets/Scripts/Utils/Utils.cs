@@ -46,6 +46,11 @@ namespace Assets.Scripts.Utils
         LoginButton
     }
 
+    public enum ButtonState
+    {
+        Pressed, StillPressing, Released, Disabled
+    }
+
     public enum ControllerType
     {
         DefaultPacked,
@@ -158,7 +163,7 @@ namespace Assets.Scripts.Utils
     {
         public static readonly float LerpRatio = 0.02f;
         public static readonly float LerpSpeed = 3f;
-        
+
         public static string GetEnumDescription(Enum value)
         {
             FieldInfo fi = value.GetType().GetField(value.ToString());

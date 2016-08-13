@@ -186,23 +186,23 @@ public class Box : MonoBehaviour
 
     void Update()
     {
-        if (Sphere == null) return;
+        //if (Sphere == null) return;
 
-        if (_pushRight == false && _pushLeft == false && _pushDown == false)
-            if (Sphere.UserPressedUp && CheckBoxRestrictions(Direction.Up))
-                _pushUp = true;
+        //if (_pushRight == false && _pushLeft == false && _pushDown == false)
+        //    if (Sphere.UserPressedUp && CheckBoxRestrictions(Direction.Up))
+        //        _pushUp = true;
 
-        if (_pushLeft == false && _pushUp == false && _pushDown == false)
-            if (Sphere.UserPressedRight && CheckBoxRestrictions(Direction.Right))
-                _pushRight = true;
+        //if (_pushLeft == false && _pushUp == false && _pushDown == false)
+        //    if (Sphere.UserPressedRight && CheckBoxRestrictions(Direction.Right))
+        //        _pushRight = true;
 
-        if (_pushRight == false && _pushLeft == false && _pushUp == false)
-            if (Sphere.UserPressedDown && CheckBoxRestrictions(Direction.Down))
-                _pushDown = true;
+        //if (_pushRight == false && _pushLeft == false && _pushUp == false)
+        //    if (Sphere.UserPressedDown && CheckBoxRestrictions(Direction.Down))
+        //        _pushDown = true;
 
-        if (_pushRight == false && _pushUp == false && _pushDown == false)
-            if (Sphere.UserPressedLeft && CheckBoxRestrictions(Direction.Left))
-                _pushLeft = true;
+        //if (_pushRight == false && _pushUp == false && _pushDown == false)
+        //    if (Sphere.UserPressedLeft && CheckBoxRestrictions(Direction.Left))
+        //        _pushLeft = true;
 
         if (_pushUp)
             MoveUpdate(_endMarkerUp, ref _pushUp);
@@ -267,26 +267,26 @@ public class Box : MonoBehaviour
 
             Destroy(_triggerCollider.gameObject);
 
-            if (UpperObject == Obstacle.Sphere)
-            {
-                Sphere.DownBox = null;
-                Sphere.Controller.DownObject = Obstacle.Nothing;
-            }
-            else if (RightObject == Obstacle.Sphere)
-            {
-                Sphere.LeftBox = null;
-                Sphere.Controller.LeftObject = Obstacle.Nothing;
-            }
-            else if (DownObject == Obstacle.Sphere)
-            {
-                Sphere.UpBox = null;
-                Sphere.Controller.UpperObject = Obstacle.Nothing;
-            }
-            else if (LeftObject == Obstacle.Sphere)
-            {
-                Sphere.RightBox = null;
-                Sphere.Controller.RightObject = Obstacle.Nothing;
-            }
+            //if (UpperObject == Obstacle.Sphere)
+            //{
+            //    Sphere.DownBox = null;
+            //    Sphere.Controller.DownObject = Obstacle.Nothing;
+            //}
+            //else if (RightObject == Obstacle.Sphere)
+            //{
+            //    Sphere.LeftBox = null;
+            //    Sphere.Controller.LeftObject = Obstacle.Nothing;
+            //}
+            //else if (DownObject == Obstacle.Sphere)
+            //{
+            //    Sphere.UpBox = null;
+            //    Sphere.Controller.UpperObject = Obstacle.Nothing;
+            //}
+            //else if (LeftObject == Obstacle.Sphere)
+            //{
+            //    Sphere.RightBox = null;
+            //    Sphere.Controller.RightObject = Obstacle.Nothing;
+            //}
             
             _boxSprite.transform.localPosition = new Vector3(_boxSprite.transform.localPosition.x, _boxSprite.transform.localPosition.y, 8f);
 
@@ -306,5 +306,36 @@ public class Box : MonoBehaviour
         if (!(_scaleLerpTime >= 1)) return;
 
         _scaleLerpTime = 0;
+    }
+
+    public void PushBox(Move direction)
+    {
+        switch (direction)
+        {
+            case Move.Up:
+
+                _pushUp = true;
+                break;
+
+            case Move.Right:
+
+                _pushRight = true;
+                break;
+
+            case Move.Down:
+
+                _pushDown = true;
+                break;
+
+            case Move.Left:
+
+                _pushLeft = true;
+                break;
+
+            case Move.None:
+                break;
+            default:
+                throw new ArgumentOutOfRangeException("direction", direction, null);
+        }
     }
 }
