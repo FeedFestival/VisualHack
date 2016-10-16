@@ -12,7 +12,7 @@ public class FacebookController : MonoBehaviour
 
     private AdView _adView;
     private InterstitialAd _interstitialAd;
-    
+
     public bool IsShowingBanner;
 
     public void Initialize(Main main)
@@ -56,19 +56,28 @@ public class FacebookController : MonoBehaviour
 
         if (FB.IsLoggedIn)
         {
-            FB.API("/me?fields=id,first_name,last_name", HttpMethod.GET, nameResult =>
+            FB.API("/me?fields=id,first_name,last_name,middle_name,link,email,token_for_business", HttpMethod.GET, nameResult =>
             {
                 if (nameResult.Error != null)
                 {
                     _main.DebugText = nameResult.Error;
                     return;
                 }
-
                 var user = new User
                 {
-                    FacebookId = long.Parse(nameResult.ResultDictionary["id"].ToString()),
-                    Name = nameResult.ResultDictionary["first_name"].ToString() + " " + nameResult.ResultDictionary["last_name"].ToString()
+                    FacebookApp = new FacebookApp
+                    {
+                        FacebookId = long.Parse(nameResult.ResultDictionary["id"].ToString()),
+                        BToken = nameResult.ResultDictionary["token_for_business"].ToString()
+                    },
+                    FirstName = nameResult.ResultDictionary["first_name"].ToString(),
+                    MiddleName = nameResult.ResultDictionary["middle_name"].ToString(),
+                    LastName = nameResult.ResultDictionary["last_name"].ToString(),
+                    Email = nameResult.ResultDictionary["email"].ToString()
                 };
+
+                user.Name = (user.FirstName + "." + (string.IsNullOrEmpty(user.MiddleName) ? "" : user.MiddleName + ".") +
+                            user.LastName).ToLower();
 
                 _main.FacebookInitializationComplete(user);
             });
@@ -146,8 +155,8 @@ public class FacebookController : MonoBehaviour
                 adView.LoadAd();
                 return;
             }
-        _main.DebugText = "Ad view disposed.";
-        _adView.Dispose();
+            _main.DebugText = "Ad view disposed.";
+            _adView.Dispose();
         }
     }
 
@@ -160,7 +169,7 @@ public class FacebookController : MonoBehaviour
         if (_interstitialAd == null)
         {
             _main.DebugText = "Loading interstitial ad...";
-            
+
             // Create the interstitial unit with a placement ID (generate your own on the Facebook app settings).
             // Use different ID for each ad placement in your app.
             var interstitialAd = new InterstitialAd("267365840301857_269678813403893");
@@ -176,10 +185,11 @@ public class FacebookController : MonoBehaviour
 
                 _main.DebugText = "Interstitial ad loaded value: " + val;
             };
-            interstitialAd.InterstitialAdDidFailWithError = delegate(string error ){
+            interstitialAd.InterstitialAdDidFailWithError = delegate (string error)
+            {
                 _main.DebugText = "Interstitial ad failed to load. Check console for details." + error;
             };
-            interstitialAd.InterstitialAdWillLogImpression = delegate()
+            interstitialAd.InterstitialAdWillLogImpression = delegate ()
             {
                 _main.DebugText = "Interstitial ad logged impression.";
             };

@@ -115,7 +115,7 @@ public class DataService
 
     public User GetUserByFacebookId(int facebookId)
     {
-        return _connection.Table<User>().Where(x => x.FacebookId == facebookId).FirstOrDefault();
+        return _connection.Table<User>().Where(x => x.FacebookApp.FacebookId == facebookId).FirstOrDefault();
     }
 
     /*

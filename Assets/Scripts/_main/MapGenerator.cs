@@ -259,6 +259,8 @@ public class MapGenerator : MonoBehaviour
         if (CurrentMap != null && CurrentMap.GameObject != null)
             Destroy(CurrentMap.GameObject);
 
+        CreateNewMapTiles();
+
         tiles = _dataService.GetTiles(CurrentMap.Id);
 
         GenerateBaseMap();
@@ -298,7 +300,12 @@ public class MapGenerator : MonoBehaviour
                 default:
                     throw new ArgumentOutOfRangeException();
             }
+            ModifyMapTile(tile);
         }
+
+        // TODO: Kick it ON !!
+        _main.Sphere.CheckSurroundings();
+        _main.Sphere.CheckRestrictions();
     }
 
     private void CreateMisc(MapTile tile, Transform parentT, bool isPitOrHill = false)
@@ -362,8 +369,8 @@ public class MapGenerator : MonoBehaviour
                 objT.transform.SetParent(CurrentMap.GameObject.transform);
                 objT.transform.localPosition = new Vector3(tile.X, tile.Y, PuzzleZIndex);
 
-                objT.GetComponent<Box>().Initialize();
-
+                objT.GetComponent<Box>().Initialize(_main);
+                tile.box = objT.GetComponent<Box>();
                 break;
 
             case PuzzleObject.Bridge:
@@ -413,5 +420,28 @@ public class MapGenerator : MonoBehaviour
             default:
                 throw new ArgumentOutOfRangeException();
         }
+    }
+
+    private void CreateNewMapTiles()
+    {
+        _main.Tiles = new MapTile[_main.MaxX + 1, _main.MaxY + 1];
+        for (var x = 0; x <= _main.MaxX; x++)
+        {
+            for (var y = 0; y <= _main.MaxY; y++)
+            {
+                _main.Tiles[x, y] = new MapTile
+                {
+                    X = x,
+                    Y = y,
+                    TyleType = TileType.Empty
+                };
+            }
+        }
+    }
+    
+    private void ModifyMapTile(MapTile m)
+    {
+        if (m.TyleType != TileType.Misc)
+            _main.Tiles[(int)m.X, (int)m.Y] = m;
     }
 }

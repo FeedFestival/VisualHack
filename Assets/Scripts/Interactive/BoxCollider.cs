@@ -7,11 +7,11 @@ public class BoxCollider : MonoBehaviour
 {
     public Direction ColliderPosition;
 
-    private Box _box;
+    public Box Box;
 
     public void Initialize(Box box, Direction colPosition)
     {
-        _box = box;
+        Box = box;
         ColliderPosition = colPosition;
     }
 
@@ -19,9 +19,9 @@ public class BoxCollider : MonoBehaviour
     {
         if (objC.CompareTag("Sphere"))
         {
-            _box.Sphere = objC.transform.parent.GetComponent<Sphere>();
+            Box.Sphere = objC.transform.parent.GetComponent<Sphere>();
             
-            _box.PlayerIsIn = ColliderPosition;
+            Box.PlayerIsIn = ColliderPosition;
         }
         
         switch (ColliderPosition)
@@ -32,12 +32,12 @@ public class BoxCollider : MonoBehaviour
                 {
                     case "BoxDown":
 
-                        _box.UpperObject = Obstacle.Box;
+                        Box.UpperObject = Obstacle.Box;
                         break;
 
                     case "SolidUp":
 
-                        _box.UpperObject = Obstacle.Solid;
+                        Box.UpperObject = Obstacle.Solid;
                         break;
                 }
                 break;
@@ -48,12 +48,12 @@ public class BoxCollider : MonoBehaviour
                 {
                     case "BoxLeft":
 
-                        _box.RightObject = Obstacle.Box;
+                        Box.RightObject = Obstacle.Box;
                         break;
 
                     case "SolidRight":
 
-                        _box.RightObject = Obstacle.Solid;
+                        Box.RightObject = Obstacle.Solid;
                         break;
                 }
                 break;
@@ -64,12 +64,12 @@ public class BoxCollider : MonoBehaviour
                 {
                     case "BoxUp":
 
-                        _box.DownObject = Obstacle.Box;
+                        Box.DownObject = Obstacle.Box;
                         break;
 
                     case "SolidDown":
 
-                        _box.DownObject = Obstacle.Solid;
+                        Box.DownObject = Obstacle.Solid;
                         break;
                 }
                 break;
@@ -80,12 +80,12 @@ public class BoxCollider : MonoBehaviour
                 {
                     case "BoxRight":
 
-                        _box.LeftObject = Obstacle.Box;
+                        Box.LeftObject = Obstacle.Box;
                         break;
 
                     case "SolidLeft":
 
-                        _box.LeftObject = Obstacle.Solid;
+                        Box.LeftObject = Obstacle.Solid;
                         break;
                 }
                 break;
@@ -99,29 +99,29 @@ public class BoxCollider : MonoBehaviour
     {
         if (objC.CompareTag("Sphere"))
         {
-            _box.Sphere = null;
+            Box.Sphere = null;
         }
 
         switch (ColliderPosition)
         {
             case Direction.Up:
 
-                _box.UpperObject = Obstacle.Nothing;
+                Box.UpperObject = Obstacle.Nothing;
                 break;
 
             case Direction.Right:
 
-                _box.RightObject = Obstacle.Nothing;
+                Box.RightObject = Obstacle.Nothing;
                 break;
 
             case Direction.Down:
 
-                _box.DownObject = Obstacle.Nothing;
+                Box.DownObject = Obstacle.Nothing;
                 break;
 
             case Direction.Left:
 
-                _box.LeftObject = Obstacle.Nothing;
+                Box.LeftObject = Obstacle.Nothing;
                 break;
 
             default:

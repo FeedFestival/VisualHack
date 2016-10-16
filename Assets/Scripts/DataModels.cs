@@ -4,6 +4,7 @@ using SQLite4Unity3d;
 using UnityEngine;
 using System.Collections;
 using System;
+using System.Net;
 
 //public class Person
 //{
@@ -25,17 +26,54 @@ public class User
 
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
+
+    public string FirstName { get; set; }
+    public string MiddleName { get; set; }
+    public string LastName { get; set; }
+    public string Email { get; set; }
+
     public string Name { get; set; }
-    public string Maps { get; set; }
+    public int Maps { get; set; }
     public bool IsUsingSound { get; set; }
     public int ControllerType { get; set; }
 
-    public long FacebookId { get; set; }
-
+    [Ignore]
+    public FacebookApp FacebookApp { get; set; }
+    
     public override string ToString()
     {
-        return string.Format("[User: Id={0}, Name={1}, Maps={2}, IsUsingSound={3}, ControllerType={4}]", Id, Name, Maps, IsUsingSound, ControllerType);
+        return string.Format("[User: Id={0}, Name={1}, Maps={2}, IsUsingSound={3}, ControllerType={4}, FacebookId={5}]", Id, Name, Maps, IsUsingSound, ControllerType, FacebookApp.FacebookId);
     }
+    
+    public static User FillData(string properties)
+    {
+        return new User
+        {
+            Id = Utils.GetIntDataValue(properties, "ID:"),
+            Name = Utils.GetDataValue(properties, "Name:"),
+            Maps = Utils.GetIntDataValue(properties, "Maps:"),
+            IsUsingSound = Utils.GetBoolDataValue(properties, "IsUsingSound:"),
+            ControllerType = Utils.GetIntDataValue(properties, "ControllerType:"),
+            FacebookApp = new FacebookApp
+            {
+                FacebookId = Utils.GetLongDataValue(properties, "FacebookId:")
+            }
+        };
+    }
+}
+
+public class FacebookApp
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+
+    public long FacebookId { get; set; }
+
+    public string Name { get; set; }
+
+    public int ConnectId { get; set; }
+
+    public string BToken { get; set; }
 }
 
 public class Map
@@ -319,4 +357,7 @@ public class MapTile
 
         return Misc.None;
     }
+
+    // in game
+    public Box box;
 }

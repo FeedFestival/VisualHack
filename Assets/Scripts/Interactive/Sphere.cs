@@ -7,9 +7,9 @@ using System.Collections.Generic;
 public class Sphere : MonoBehaviour
 {
     public Main Main;
-    
+
     [SerializeField]
-    public List<Move> directionList;
+    public List<Move> DirectionList;
 
     public Move GoDirection;
 
@@ -22,7 +22,7 @@ public class Sphere : MonoBehaviour
 
     // boxes
     [HideInInspector]
-    public Box UpBox;
+    public Box UpperBox;
     [HideInInspector]
     public Box RightBox;
     [HideInInspector]
@@ -64,10 +64,12 @@ public class Sphere : MonoBehaviour
         }
     }
 
+    private readonly List<Obstacle> _boxSurroundingObjects = new List<Obstacle> { Obstacle.Solid, Obstacle.Box };
+
     public void Initialize(Main main)
     {
         Main = main;
-        
+
         _thisTransform = transform;
 
         Transform[] allChildren = transform.GetComponentsInChildren<Transform>(true);
@@ -137,7 +139,7 @@ public class Sphere : MonoBehaviour
             {
                 case Move.Up:
 
-                    if (UpBox)
+                    if (UpperBox)
                         PushBox(Move.Up);
 
                     MoveUpdate(_endMarkerUp);
@@ -145,15 +147,24 @@ public class Sphere : MonoBehaviour
 
                 case Move.Right:
 
+                    if (RightBox)
+                        PushBox(Move.Right);
+
                     MoveUpdate(_endMarkerRight);
                     break;
 
                 case Move.Down:
 
+                    if (DownBox)
+                        PushBox(Move.Down);
+
                     MoveUpdate(_endMarkerDown);
                     break;
 
                 case Move.Left:
+
+                    if (LeftBox)
+                        PushBox(Move.Left);
 
                     MoveUpdate(_endMarkerLeft);
                     break;
@@ -169,11 +180,15 @@ public class Sphere : MonoBehaviour
         _lerpTime = _lerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_lerpTime >= 1)) return;
+        // when the animation ends
+
+        _thisTransform.position = endMarker;
+
+        CheckSurroundings();
 
         if (CheckRestrictions())
             GoDirection = GetLastDirection();
 
-        _thisTransform.position = endMarker;
         CalculateNewCoord();
     }
 
@@ -211,7 +226,7 @@ public class Sphere : MonoBehaviour
     private void MoveTowards(Move moveDirection)
     {
         if (moveDirection == Move.None)
-            directionList = new List<Move>();
+            DirectionList = new List<Move>();
         else
             AddToDirections(moveDirection);
 
@@ -226,8 +241,8 @@ public class Sphere : MonoBehaviour
         {
             case Move.Up:
 
-                if (UpBox != null)
-                    UpBox.PushBox(move);
+                if (UpperBox != null)
+                    UpperBox.PushBox(move);
                 break;
 
             case Move.Right:
@@ -260,11 +275,53 @@ public class Sphere : MonoBehaviour
         _lerpTime = 0f;
 
         _startMarker = _thisTransform.position;
+
         _endMarkerRight = new Vector3(_thisTransform.position.x + 1f, _thisTransform.position.y, _thisTransform.position.z);
         _endMarkerLeft = new Vector3(_thisTransform.position.x - 1f, _thisTransform.position.y, _thisTransform.position.z);
         _endMarkerUp = new Vector3(_thisTransform.position.x, _thisTransform.position.y + 1f, _thisTransform.position.z);
         _endMarkerDown = new Vector3(_thisTransform.position.x, _thisTransform.position.y - 1f, _thisTransform.position.z);
     }
+
+    private void AddToDirections(Move moveDir)
+    {
+        if (DirectionList == null)
+            DirectionList = new List<Move>();
+
+        if (DirectionList.Contains(moveDir))
+            return;
+
+        DirectionList.Add(moveDir);
+    }
+
+    private void RemoveFromDirections(Move moveDir)
+    {
+        if (!DirectionList.Contains(moveDir))
+            return;
+
+        DirectionList.Remove(moveDir);
+    }
+
+    private Move GetLastDirection()
+    {
+        if (DirectionList.Count < 1)
+        {
+            MoveTowards(Move.None);
+            return Move.None;
+        }
+
+        return DirectionList[DirectionList.Count - 1];
+    }
+
+
+
+
+
+
+
+
+
+
+
 
     /***************************\//----------------------------------------------\
     *                           												*
@@ -274,41 +331,130 @@ public class Sphere : MonoBehaviour
     \***************************/
     // ---------------------------------------------\
 
-    void OnTriggerEnter(Collider foreignObjectCollider)
+    public void CheckSurroundings()
     {
-        //Debug.Log(foreignObjectCollider);
-        if (foreignObjectCollider.CompareTag("BoxUp"))
+        var oldX = Mathf.RoundToInt(_startMarker.x);
+        var oldY = Mathf.RoundToInt(_startMarker.y);
+        Main.Tiles[oldX, oldY] = new MapTile
         {
-            DownObject = Obstacle.Box;
-        }
-        if (foreignObjectCollider.CompareTag("BoxRight"))
+            X = oldX,
+            Y = oldY,
+            TyleType = TileType.Empty
+        };
+
+
+        var x = Mathf.RoundToInt(_thisTransform.position.x);
+        var y = Mathf.RoundToInt(_thisTransform.position.y);
+        Main.Tiles[x, y] = new MapTile
         {
-            LeftObject = Obstacle.Box;
-        }
-        if (foreignObjectCollider.CompareTag("BoxDown"))
+            X = x,
+            Y = y,
+            TyleType = TileType.PuzzleObject,
+            PuzzleObject = PuzzleObject.Player
+        };
+
+        // UP
+        if (y + 1 > Main.MaxY)
+            UpperObject = Obstacle.Solid;
+        else
         {
-            UpperObject = Obstacle.Box;
-        }
-        if (foreignObjectCollider.CompareTag("BoxLeft"))
-        {
-            RightObject = Obstacle.Box;
+            var upperTile = Main.Tiles[x, y + 1];
+
+            if (upperTile == null || upperTile.TyleType == TileType.Solid)
+                UpperObject = Obstacle.Solid;
+            else if (upperTile.TyleType == TileType.PuzzleObject && upperTile.PuzzleObject == PuzzleObject.Box)
+            {
+                UpperBox = upperTile.box;
+            }
+            else
+                UpperObject = Obstacle.Nothing;
+
+            if (UpperBox != null)
+            {
+                UpperBox.CheckSurroundings();
+                if (_boxSurroundingObjects.Contains(UpperBox.UpperObject))
+                    UpperObject = Obstacle.Solid;
+                else
+                    UpperObject = Obstacle.Box;
+            }
         }
 
-        if (foreignObjectCollider.CompareTag("SolidUp"))
-        {
-            UpperObject = Obstacle.Solid;
-        }
-        if (foreignObjectCollider.CompareTag("SolidRight"))
-        {
+        // RIGHT
+        if (x + 1 > Main.MaxX)
             RightObject = Obstacle.Solid;
-        }
-        if (foreignObjectCollider.CompareTag("SolidDown"))
+        else
         {
+            var rightTile = Main.Tiles[x + 1, y];
+
+            if (rightTile == null || rightTile.TyleType == TileType.Solid)
+                RightObject = Obstacle.Solid;
+            else if (rightTile.TyleType == TileType.PuzzleObject && rightTile.PuzzleObject == PuzzleObject.Box)
+            {
+                RightBox = rightTile.box;
+            }
+            else
+                RightObject = Obstacle.Nothing;
+
+            if (RightBox != null)
+            {
+                RightBox.CheckSurroundings();
+                if (_boxSurroundingObjects.Contains(RightBox.RightObject))
+                    RightObject = Obstacle.Solid;
+                else
+                    RightObject = Obstacle.Box;
+            }
+        }
+
+        // DOWN
+        if (y - 1 < 0)
             DownObject = Obstacle.Solid;
-        }
-        if (foreignObjectCollider.CompareTag("SolidLeft"))
+        else
         {
+            var downTile = Main.Tiles[x, y - 1];
+
+            if (downTile == null || downTile.TyleType == TileType.Solid)
+                DownObject = Obstacle.Solid;
+            else if (downTile.TyleType == TileType.PuzzleObject && downTile.PuzzleObject == PuzzleObject.Box)
+            {
+                DownBox = downTile.box;
+            }
+            else
+                DownObject = Obstacle.Nothing;
+
+            if (DownBox != null)
+            {
+                DownBox.CheckSurroundings();
+                if (_boxSurroundingObjects.Contains(DownBox.DownObject))
+                    DownObject = Obstacle.Solid;
+                else
+                    DownObject = Obstacle.Box;
+            }
+        }
+
+        // LEFT
+        if (x - 1 < 0)
             LeftObject = Obstacle.Solid;
+        else
+        {
+            var leftTile = Main.Tiles[x - 1, y];
+
+            if (leftTile == null || leftTile.TyleType == TileType.Solid)
+                LeftObject = Obstacle.Solid;
+            else if (leftTile.TyleType == TileType.PuzzleObject && leftTile.PuzzleObject == PuzzleObject.Box)
+            {
+                LeftBox = leftTile.box;
+            }
+            else
+                LeftObject = Obstacle.Nothing;
+
+            if (LeftBox != null)
+            {
+                LeftBox.CheckSurroundings();
+                if (_boxSurroundingObjects.Contains(LeftBox.LeftObject))
+                    LeftObject = Obstacle.Solid;
+                else
+                    LeftObject = Obstacle.Box;
+            }
         }
     }
 
@@ -316,18 +462,38 @@ public class Sphere : MonoBehaviour
     {
         if (foreignObjectCollider.CompareTag("BoxUp"))
         {
+            if (DownBox != null)
+            {
+                DownBox.CheckSurroundings();
+                DownBox = null;
+            }
             DownObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxRight"))
         {
+            if (LeftBox != null)
+            {
+                LeftBox.CheckSurroundings();
+                LeftBox = null;
+            }
             LeftObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxDown"))
         {
+            if (UpperBox != null)
+            {
+                UpperBox.CheckSurroundings();
+                UpperBox = null;
+            }
             UpperObject = Obstacle.Nothing;
         }
         if (foreignObjectCollider.CompareTag("BoxLeft"))
         {
+            if (RightBox != null)
+            {
+                RightBox.CheckSurroundings();
+                RightBox = null;
+            }
             RightObject = Obstacle.Nothing;
         }
 
@@ -377,10 +543,10 @@ public class Sphere : MonoBehaviour
         return false;
     }
 
-    private bool CheckRestrictions()
+    public bool CheckRestrictions()
     {
         var ret = true;
-        if (UpperObject != Obstacle.Nothing)
+        if (UpperObject == Obstacle.Solid)
         {
             ControllerUp = ButtonState.Disabled;
             if (GetLastDirection() == Move.Up)
@@ -390,7 +556,7 @@ public class Sphere : MonoBehaviour
         {
             ControllerUp = ButtonState.Released;
         }
-        if (RightObject != Obstacle.Nothing)
+        if (RightObject == Obstacle.Solid)
         {
             ControllerRight = ButtonState.Disabled;
             if (GetLastDirection() == Move.Right)
@@ -400,7 +566,7 @@ public class Sphere : MonoBehaviour
         {
             ControllerRight = ButtonState.Released;
         }
-        if (DownObject != Obstacle.Nothing)
+        if (DownObject == Obstacle.Solid)
         {
             ControllerDown = ButtonState.Disabled;
             if (GetLastDirection() == Move.Down)
@@ -410,7 +576,7 @@ public class Sphere : MonoBehaviour
         {
             ControllerDown = ButtonState.Released;
         }
-        if (LeftObject != Obstacle.Nothing)
+        if (LeftObject == Obstacle.Solid)
         {
             ControllerLeft = ButtonState.Disabled;
             if (GetLastDirection() == Move.Left)
@@ -425,35 +591,5 @@ public class Sphere : MonoBehaviour
             MoveTowards(Move.None);
 
         return ret;
-    }
-
-    private void AddToDirections(Move moveDir)
-    {
-        if (directionList == null)
-            directionList = new List<Move>();
-
-        if (directionList.Contains(moveDir))
-            return;
-
-        directionList.Add(moveDir);
-    }
-
-    private void RemoveFromDirections(Move moveDir)
-    {
-        if (!directionList.Contains(moveDir))
-            return;
-
-        directionList.Remove(moveDir);
-    }
-
-    private Move GetLastDirection()
-    {
-        if (directionList.Count < 1)
-        {
-            MoveTowards(Move.None);
-            return Move.None;
-        }
-
-        return directionList[directionList.Count - 1];
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Assets.Scripts.Utils;
 using UnityEngine;
@@ -59,6 +60,11 @@ public class Main : MonoBehaviour
     public GameObject AdBanner;
 
     public GameObject Canvas;
+
+    // Map
+    public int MaxX = 11;
+    public int MaxY = 8;
+    public MapTile[,] Tiles;
 
     public void ClearDebugLog()
     {
@@ -129,7 +135,7 @@ public class Main : MonoBehaviour
         }
         else
         {
-            if (_loggedUser.FacebookId > 0 && user == null)
+            if (_loggedUser.FacebookApp != null && user == null)
                 SetProfilePicture();
             else if (user != null)
                 FacebookController.GetProfilePicture();
@@ -148,7 +154,7 @@ public class Main : MonoBehaviour
             _loggedUser = DataService.GetLastUser();
         }
 
-        if (_loggedUser.FacebookId < 1)
+        if (_loggedUser.FacebookApp == null)
         {
             _gameUi.ProfileName.gameObject.SetActive(false);
 
@@ -174,7 +180,7 @@ public class Main : MonoBehaviour
 
     public void SetProfilePicture(Texture2D texture = null)
     {
-        string picName = Utils.GetProfilePictureName(_loggedUser.Name, _loggedUser.FacebookId);
+        string picName = Utils.GetProfilePictureName(_loggedUser.Name, _loggedUser.FacebookApp.FacebookId);
 
         if (texture != null)
             Utils.SavePic(texture, texture.width, texture.height, picName);

@@ -4,6 +4,8 @@ using Assets.Scripts.Utils;
 
 public class Box : MonoBehaviour
 {
+    private Main _main;
+
     [SerializeField]
     private Sphere _sphere;
     [SerializeField]
@@ -27,7 +29,7 @@ public class Box : MonoBehaviour
                 if (DownObject == Obstacle.Sphere)
                 {
                     DownObject = Obstacle.Nothing;
-                    Sphere.UpBox = null;
+                    Sphere.UpperBox = null;
                 }
                 if (LeftObject == Obstacle.Sphere)
                 {
@@ -65,7 +67,7 @@ public class Box : MonoBehaviour
                 case Direction.Down:
 
                     DownObject = Obstacle.Sphere;
-                    Sphere.UpBox = this;
+                    Sphere.UpperBox = this;
                     break;
 
                 case Direction.Left:
@@ -115,8 +117,9 @@ public class Box : MonoBehaviour
     private Vector3 _endMarkerDown;
 
     // Use this for initialization
-    public void Initialize()
+    public void Initialize(Main main)
     {
+        _main = main;
         _thisTransform = transform;
         Transform[] allChildren = _thisTransform.GetComponentsInChildren<Transform>(true);
         foreach (Transform objT in allChildren)
@@ -186,24 +189,6 @@ public class Box : MonoBehaviour
 
     void Update()
     {
-        //if (Sphere == null) return;
-
-        //if (_pushRight == false && _pushLeft == false && _pushDown == false)
-        //    if (Sphere.UserPressedUp && CheckBoxRestrictions(Direction.Up))
-        //        _pushUp = true;
-
-        //if (_pushLeft == false && _pushUp == false && _pushDown == false)
-        //    if (Sphere.UserPressedRight && CheckBoxRestrictions(Direction.Right))
-        //        _pushRight = true;
-
-        //if (_pushRight == false && _pushLeft == false && _pushUp == false)
-        //    if (Sphere.UserPressedDown && CheckBoxRestrictions(Direction.Down))
-        //        _pushDown = true;
-
-        //if (_pushRight == false && _pushUp == false && _pushDown == false)
-        //    if (Sphere.UserPressedLeft && CheckBoxRestrictions(Direction.Left))
-        //        _pushLeft = true;
-
         if (_pushUp)
             MoveUpdate(_endMarkerUp, ref _pushUp);
 
@@ -267,27 +252,6 @@ public class Box : MonoBehaviour
 
             Destroy(_triggerCollider.gameObject);
 
-            //if (UpperObject == Obstacle.Sphere)
-            //{
-            //    Sphere.DownBox = null;
-            //    Sphere.Controller.DownObject = Obstacle.Nothing;
-            //}
-            //else if (RightObject == Obstacle.Sphere)
-            //{
-            //    Sphere.LeftBox = null;
-            //    Sphere.Controller.LeftObject = Obstacle.Nothing;
-            //}
-            //else if (DownObject == Obstacle.Sphere)
-            //{
-            //    Sphere.UpBox = null;
-            //    Sphere.Controller.UpperObject = Obstacle.Nothing;
-            //}
-            //else if (LeftObject == Obstacle.Sphere)
-            //{
-            //    Sphere.RightBox = null;
-            //    Sphere.Controller.RightObject = Obstacle.Nothing;
-            //}
-            
             _boxSprite.transform.localPosition = new Vector3(_boxSprite.transform.localPosition.x, _boxSprite.transform.localPosition.y, 8f);
 
             Destroy(this);
@@ -300,7 +264,7 @@ public class Box : MonoBehaviour
     {
         _thisTransform.localScale = Vector3.Lerp(new Vector3(1, 1, 1), new Vector3(0.85f, 0.85f, 1), _scaleLerpTime * 4);
         _boxSprite.color = Color.Lerp(Color.white, new Color32(199, 199, 199, 255), _scaleLerpTime * 4);
-        
+
         _scaleLerpTime = _scaleLerpTime + Utils.LerpRatio * Utils.LerpSpeed;
 
         if (!(_scaleLerpTime >= 1)) return;
@@ -336,6 +300,100 @@ public class Box : MonoBehaviour
                 break;
             default:
                 throw new ArgumentOutOfRangeException("direction", direction, null);
+        }
+    }
+
+
+
+
+
+    /***************************\//----------------------------------------------\
+    *                           												*
+    * The Colliding effects 													*
+    * 					        												*
+    *                           												*
+    \***************************/
+    // ---------------------------------------------\
+
+    public void CheckSurroundings()
+    {
+        var x = Mathf.RoundToInt(_thisTransform.position.x);
+        var y = Mathf.RoundToInt(_thisTransform.position.y);
+        _main.Tiles[x, y] = new MapTile
+        {
+            X = x,
+            Y = y,
+            TyleType = TileType.PuzzleObject,
+            PuzzleObject = PuzzleObject.Box,
+            box = this
+        };
+
+        // UP
+        if (y + 1 > _main.MaxY)
+            UpperObject = Obstacle.Solid;
+        else
+        {
+            var upperTile = _main.Tiles[x, y + 1];
+
+            if (upperTile == null || upperTile.TyleType == TileType.Solid)
+                UpperObject = Obstacle.Solid;
+            else if (upperTile.TyleType == TileType.PuzzleObject && upperTile.PuzzleObject == PuzzleObject.Box)
+            {
+                UpperObject = Obstacle.Box;
+            }
+            else
+                UpperObject = Obstacle.Nothing;
+        }
+
+        // RIGHT
+        if (x + 1 > _main.MaxX)
+            RightObject = Obstacle.Solid;
+        else
+        {
+            var rightTile = _main.Tiles[x + 1, y];
+
+            if (rightTile == null || rightTile.TyleType == TileType.Solid)
+                RightObject = Obstacle.Solid;
+            else if (rightTile.TyleType == TileType.PuzzleObject && rightTile.PuzzleObject == PuzzleObject.Box)
+            {
+                RightObject = Obstacle.Box;
+            }
+            else
+                RightObject = Obstacle.Nothing;
+        }
+
+        // DOWN
+        if (y - 1 < 0)
+            DownObject = Obstacle.Solid;
+        else
+        {
+            var downTile = _main.Tiles[x, y - 1];
+
+            if (downTile == null || downTile.TyleType == TileType.Solid)
+                DownObject = Obstacle.Solid;
+            else if (downTile.TyleType == TileType.PuzzleObject && downTile.PuzzleObject == PuzzleObject.Box)
+            {
+                DownObject = Obstacle.Box;
+            }
+            else
+                DownObject = Obstacle.Nothing;
+        }
+
+        // LEFT
+        if (x - 1 < 0)
+            LeftObject = Obstacle.Solid;
+        else
+        {
+            var leftTile = _main.Tiles[x - 1, y];
+
+            if (leftTile == null || leftTile.TyleType == TileType.Solid)
+                LeftObject = Obstacle.Solid;
+            else if (leftTile.TyleType == TileType.PuzzleObject && leftTile.PuzzleObject == PuzzleObject.Box)
+            {
+                LeftObject = Obstacle.Box;
+            }
+            else
+                LeftObject = Obstacle.Nothing;
         }
     }
 }
