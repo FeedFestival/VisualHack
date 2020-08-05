@@ -41,7 +41,7 @@ namespace AudienceNetwork.Editor
         {
             if (target == BuildTarget.Android) {
                 // The default Bundle Identifier for Unity does magical things that causes bad stuff to happen
-                if (PlayerSettings.bundleIdentifier == "com.Company.ProductName") {
+                if (PlayerSettings.applicationIdentifier == "com.Company.ProductName") {
                     Debug.LogError ("The default Unity Bundle Identifier (com.Company.ProductName) will not work correctly.");
                 }
 

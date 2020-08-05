@@ -24,7 +24,7 @@ public class DataLoader : MonoBehaviour
     // Use this for initialization
     IEnumerator GetUsers()
     {
-        WWW userData = new WWW("http://localhost:8080/FeedFestStudio/UserData.php");
+        WWW userData = new WWW("http://localhost:8080/GameScript,Service/UserService/addUser.php");
 
         yield return userData;
 

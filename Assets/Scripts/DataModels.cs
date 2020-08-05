@@ -24,6 +24,14 @@ using System.Net;
 public class User
 {
 
+    //Uitate in SQLite4Unity3d
+
+    //pune ce ai gasit in sql intr-o lista
+
+   // return eaza lista;
+
+    //
+
     [PrimaryKey, AutoIncrement]
     public int Id { get; set; }
 
