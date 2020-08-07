@@ -11,7 +11,6 @@ public class Logic_Object_RightCollider : MonoBehaviour {
     \***************************/
 
     public Logic_PushedObject ObjectParent;
-    Transform thisObject;
 
     void OnTriggerEnter(Collider obj)
     {
@@ -72,10 +71,5 @@ public class Logic_Object_RightCollider : MonoBehaviour {
             // Player can (probably) push right again !
             ObjectParent.DontLockPushing(6);    // right.
         }
-    }
-
-    void Awake()
-    {
-        thisObject = this.transform;
     }
 }

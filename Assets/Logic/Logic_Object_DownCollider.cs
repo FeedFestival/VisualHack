@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Logic_Object_DownCollider : MonoBehaviour {
+public class Logic_Object_DownCollider : MonoBehaviour
+{
 
     /***************************\
     *                           *
@@ -11,7 +12,6 @@ public class Logic_Object_DownCollider : MonoBehaviour {
     \***************************/
 
     public Logic_PushedObject ObjectParent;
-    Transform thisObject;
 
     void OnTriggerEnter(Collider obj)
     {
@@ -74,10 +74,5 @@ public class Logic_Object_DownCollider : MonoBehaviour {
             // Player can (probably) push down again !
             ObjectParent.DontLockPushing(2);    // down.
         }
-    }
-
-    void Awake()
-    {
-        thisObject = this.transform;
     }
 }

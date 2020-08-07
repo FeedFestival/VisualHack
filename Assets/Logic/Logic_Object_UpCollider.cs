@@ -11,7 +11,6 @@ public class Logic_Object_UpCollider : MonoBehaviour {
     \***************************/
 
     public Logic_PushedObject ObjectParent;
-    Transform thisObject;
 
     void OnTriggerEnter(Collider obj)
     {
@@ -77,10 +76,5 @@ public class Logic_Object_UpCollider : MonoBehaviour {
             // Player can (probably) push up again !
             ObjectParent.DontLockPushing(8);    // up.
         }
-    }
-
-    void Awake()
-    {
-        thisObject = this.transform;
     }
 }

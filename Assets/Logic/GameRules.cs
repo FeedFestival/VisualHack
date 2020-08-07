@@ -6,7 +6,8 @@ using System.Xml.Linq;
 using System.Linq;
 using System.IO;
 
-public class GameRules : MonoBehaviour {
+public class GameRules : MonoBehaviour
+{
 
     public bool isPortalTriggersComplete = false;
 
@@ -14,31 +15,33 @@ public class GameRules : MonoBehaviour {
     public List<GameObject> PortalTriggers;
     public List<GameObject> activatedPortalTriggers;
 
-    int maxBoxes;
     public List<GameObject> Boxes;
 
-    void Start() {
+    void Start()
+    {
         activatedPortalTriggers = new List<GameObject>();
     }
 
-    public void addPortalTriggers(GameObject obj) {
+    public void addPortalTriggers(GameObject obj)
+    {
         PortalTriggers.Add(obj);
         maxPortalsTriggers = PortalTriggers.Count;
     }
     public void addBoxes(GameObject obj)
     {
         Boxes.Add(obj);
-        maxBoxes = Boxes.Count;
     }
 
-    public void activatePortal(int portalIndex) {
-        for (var i = 0; i < PortalTriggers.Count; i++ ){
-                if (PortalTriggers[i].GetComponent<Logic_PortalTrigger>().index == portalIndex)
-                {
-                    activatedPortalTriggers.Add(PortalTriggers[i]);
-                    PortalTriggers.Remove(PortalTriggers[i]);
-                }
+    public void activatePortal(int portalIndex)
+    {
+        for (var i = 0; i < PortalTriggers.Count; i++)
+        {
+            if (PortalTriggers[i].GetComponent<Logic_PortalTrigger>().index == portalIndex)
+            {
+                activatedPortalTriggers.Add(PortalTriggers[i]);
+                PortalTriggers.Remove(PortalTriggers[i]);
             }
+        }
 
         if (activatedPortalTriggers.Count == maxPortalsTriggers)
         {

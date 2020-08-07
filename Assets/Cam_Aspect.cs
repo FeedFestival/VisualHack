@@ -20,7 +20,7 @@ public class Cam_Aspect : MonoBehaviour {
 		// apply to the camera.rect property
 		// by default, we set them up in 1.0
 		float ptw = 1.0f;
-		float pthat = 1.0f;
+        //float pthat = 1.0f;
 		
 		// these variables will help us adjust the margin to center the screen
 		float tx  = 0.0f;

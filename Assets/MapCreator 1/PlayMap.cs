@@ -5,6 +5,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Linq;
 using System.IO;
+using System;
 
 public class PlayMap : MonoBehaviour {
 
@@ -30,9 +31,12 @@ public class PlayMap : MonoBehaviour {
     // It takes the filename and opens it up for reading.
     public void ReadTilesFromPath(string fileName)
     {
-        var text = File.ReadAllText(baseFileDirectory + fileName + ".xml");
+        TextAsset textAsset = (TextAsset)Resources.Load("Maps/" + fileName) as TextAsset;
 
-        ReadTiles(text);
+        XmlDocument xmldoc = new XmlDocument();
+        xmldoc.LoadXml(textAsset.text);
+
+        ReadTiles(xmldoc);
     }
 
     // Read from xml variables. (have no idea what they do but they work.)
@@ -43,11 +47,11 @@ public class PlayMap : MonoBehaviour {
     string baseFileDirectory ;
 
     // Read the xml and put the data in a Tile list.
-    void ReadTiles(string text)
+    void ReadTiles(XmlDocument xmlDoc)
     {
-        XmlDocument xmlDoc = new XmlDocument();
+        //XmlDocument xmlDoc = new XmlDocument();
 
-        xmlDoc.LoadXml(text);
+        //xmlDoc.LoadXml(text);
         XmlNodeList TileList = xmlDoc.GetElementsByTagName("Tile");
 
         foreach (XmlNode tileInfo in TileList)
@@ -112,20 +116,18 @@ public class PlayMap : MonoBehaviour {
         return 100;
     }
 
-    string filepath;
-
     // Temporary - Just open a map for test playing.
     MapTilesRefrences TileTexture;
     Tiles_PropertyRefrences TileProperty;
     GameRules gameRules;
     void StartMap() {
-        baseFileDirectory = Application.dataPath + Path.DirectorySeparatorChar + "Maps" + Path.DirectorySeparatorChar;
+        
 
         TileTexture = this.GetComponent<MapTilesRefrences>();
         TileProperty = this.GetComponent<Tiles_PropertyRefrences>();
         gameRules = this.gameObject.GetComponent<GameRules>();
-        ReadTilesFromPath("Test");
-        Debug.Log(baseFileDirectory + "Test");
+
+        ReadTilesFromPath("Test_Gaby_Florian");
     }
 
     // Variables fr map building.

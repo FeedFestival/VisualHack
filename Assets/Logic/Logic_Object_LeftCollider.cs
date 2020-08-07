@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class Logic_Object_LeftCollider : MonoBehaviour {
+public class Logic_Object_LeftCollider : MonoBehaviour
+{
 
     /***************************\
     *                           *
@@ -11,14 +12,13 @@ public class Logic_Object_LeftCollider : MonoBehaviour {
     \***************************/
 
     public Logic_PushedObject ObjectParent;
-    Transform thisObject;
 
     void OnTriggerEnter(Collider obj)
     {
         if (obj.gameObject.name == "Sphere")
         {
-            ObjectParent.setPushingParent (obj.transform.parent.gameObject.GetComponent<Logic_ControlObject>());
-            
+            ObjectParent.setPushingParent(obj.transform.parent.gameObject.GetComponent<Logic_ControlObject>());
+
             // Push right !
             if (ObjectParent.lock_rightPushing == false)
             {
@@ -74,9 +74,5 @@ public class Logic_Object_LeftCollider : MonoBehaviour {
             // Player can (probably) push left again !
             ObjectParent.DontLockPushing(4);    // left.
         }
-    }
-
-    void Awake() {
-        thisObject = this.transform;
     }
 }
