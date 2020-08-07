@@ -1,0 +1,122 @@
+fileFormatVersion: 2
+guid: 3108c7e76e09f5d42af995e8eabaca57
+ModelImporter:
+  serializedVersion: 16
+  fileIDToRecycleName:
+    100000: Bone
+    100002: Door_Mechanism
+    100004: Left_Pylon_Door
+    100006: Left_Pylon_Door_Tracks
+    100008: Left_Pylon_Mechanism
+    100010: Left_Pylon_Second_Door_Tracks
+    100012: Left_Pylon_Second_Mech
+    100014: Lowed_Door_Track
+    100016: Lowed_Door_Track_Base
+    100018: Lower_Door
+    100020: Pylons
+    100022: Pylons_Gun_Doors
+    100024: Right_Pylon
+    100026: Right_Pylon_Door
+    100028: Right_Pylon_Door_Roler
+    100030: Right_Pylon_Door_Track
+    100032: Right_Pylon_Mechanism
+    100034: Right_Pylon_Second_Mech
+    100036: Ship
+    100038: ShipSkeleton
+    100040: //RootNode
+    100042: Static_Parts_Ship
+    100044: Upper_Door
+    100046: Upper_Door_Track
+    400000: Bone
+    400002: Door_Mechanism
+    400004: Left_Pylon_Door
+    400006: Left_Pylon_Door_Tracks
+    400008: Left_Pylon_Mechanism
+    400010: Left_Pylon_Second_Door_Tracks
+    400012: Left_Pylon_Second_Mech
+    400014: Lowed_Door_Track
+    400016: Lowed_Door_Track_Base
+    400018: Lower_Door
+    400020: Pylons
+    400022: Pylons_Gun_Doors
+    400024: Right_Pylon
+    400026: Right_Pylon_Door
+    400028: Right_Pylon_Door_Roler
+    400030: Right_Pylon_Door_Track
+    400032: Right_Pylon_Mechanism
+    400034: Right_Pylon_Second_Mech
+    400036: Ship
+    400038: ShipSkeleton
+    400040: //RootNode
+    400042: Static_Parts_Ship
+    400044: Upper_Door
+    400046: Upper_Door_Track
+    2300000: Static_Parts_Ship
+    3300000: Static_Parts_Ship
+    4300000: Pylons_Gun_Doors
+    4300002: Pylons
+    4300004: ShipSkeleton
+    4300006: Door_Mechanism
+    4300008: Static_Parts_Ship
+    7400000: Default Take
+    7400002: OpenDoor
+    7400004: Right_Pylon_Door
+    9500000: //RootNode
+    11100000: //RootNode
+    13700000: Door_Mechanism
+    13700002: Pylons
+    13700004: Pylons_Gun_Doors
+    13700006: ShipSkeleton
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    optimizeGameObjects: 0
+    animationCompression: 1
+    animationRotationError: .5
+    animationPositionError: .5
+    animationScaleError: .5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importBlendShapes: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+  tangentSpace:
+    normalSmoothAngle: 60
+    splitTangentsAcrossUV: 1
+    normalImportMode: 0
+    tangentImportMode: 1
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    human: []
+    skeleton: []
+    armTwist: .5
+    foreArmTwist: .5
+    upperLegTwist: .5
+    legTwist: .5
+    armStretch: .0500000007
+    legStretch: .0500000007
+    feetSpacing: 0
+    rootMotionBoneName: 
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 1
+  additionalBone: 0
+  userData: 
