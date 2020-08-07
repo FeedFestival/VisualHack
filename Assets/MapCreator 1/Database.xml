@@ -1,0 +1,14 @@
+﻿<TilesTake>
+  <Tile>
+    <Id>0</Id>
+    <TilePos_X>0</TilePos_X>
+    <TilePos_Y>0</TilePos_Y>
+    
+  </Tile>
+  <Tile>
+    <Id>1</Id>
+    <TilePos_X>1</TilePos_X>
+    <TilePos_Y>0</TilePos_Y>
+
+  </Tile>
+</TilesTake>
